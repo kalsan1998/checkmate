@@ -46,7 +46,7 @@ void GameController::setupMode(){
 			if((in >> piece) && (in >> location)){
 				PieceInfo pieceInfo = PieceInfo::parse(pieceStr);
 				Location location = Location::parse(locationStr);
-				board->executeEdit(make_unique<PieceAdd>(location, pieceInfo));
+				board->executeEdit(PieceAdd{location, pieceInfo});
 			}
 		//remove a piece
 		}else if(cmd == "-"){
@@ -54,7 +54,7 @@ void GameController::setupMode(){
 			//get location then execute command to remove
 			if(in >> locationStr){
 				Location location = Location::parse(locationStr);
-				board->executeEdit(make_unique<PieceRemove(location));
+				board->executeEdit(PieceRemove{location});
 			}
 		}else if(cmd == "="){
 			string colourStr;

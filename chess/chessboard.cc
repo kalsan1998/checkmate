@@ -2,10 +2,12 @@
 #include "boardobserver.h"
 #include "piece.h"
 #include "location.h"
-#include "boardchange.h"
+#include "boardedit.h"
 #include "chessmove.h"
 #include "invalidmove.h"
 using namespace std;
+
+ChessBoard::~ChessBoard{}
 
 bool ChessBoard::isMoveLegal(const ChessMove &move) const{
 	Colour colour = move.getColour();
@@ -29,16 +31,21 @@ void ChessBoard::notifyObservers() const{
 
 void ChessBoard::attachObserver(BoardObserver *obs){
 	observers.emplace_back(obs);
+	obs->notify(*this);
 }
 
 void ChessBoard::detachObserver(BoardObserver *obs){
 	//iterate through observers until matching observer is found
-	for(auto it = observers.begin(); it < obsservers.end(); ++it){
+	for(auto it = observers.begin(); it != obsservers.end(); ++it){
 		if(obs == *it){
 			observers.erase(it);
 			break;
 		}
 	}
+}
+
+const map<Location, unique_ptr<Piece>> &getBoard() const{
+	return theBoard;
 }
 
 const Piece &ChessBoard::getPieceAt(Location location) const{
@@ -49,14 +56,14 @@ const vector<shared_ptr<ChessMove>> &ChessBoard::getLegalMoves(const Colour colo
 	return legalMoves.get(colour); 
 }
 
-void ChessBoard::executeEdit(const BoardChange &edit){
-	edit.executeChange(*this);	
+void ChessBoard::executeEdit(const BoardEdit &edit){
+	edit.execute(*this);	
 }
 
 void ChessBoard::executeChessMove(const shared_ptr<const ChessMove> move){
 	if(isMoveValid(*move)){
 		//execute the move, then notify observers, then add this to the stacl
-		move->executeChange(*this);
+		move->execute(*this);
 		notifyObservers();
 		executedMoves.push(move);
 	}else{
@@ -67,8 +74,9 @@ void ChessBoard::executeChessMove(const shared_ptr<const ChessMove> move){
 void ChessBoard::undo(){
 	//execute opposite of last move, then remove from moves stack
 	const shared_ptr<const ChessMove> move = executedMoves.top();
-	move->executeReverseChange(*this);
+	move->executeReverse(*this);
 	executedMoves.pop();
+	notifyObservers();
 }
 
 bool isStalemate(const Colour turn){
