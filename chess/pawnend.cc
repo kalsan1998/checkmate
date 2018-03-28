@@ -1,5 +1,6 @@
 #include "standardmove.h"
 #include "piece.h"
+#include "pawn.h"
 #include "location.h"
 #include "pieceadd.h"
 #include "pieceremove.h"
@@ -7,10 +8,10 @@
 using namespace std;
 
 
-StandardMove::StandardMove(shared_ptr<Piece> piece, Location end){	
+StandardMove::StandardMove(shared_ptr<Pawn> pawn, shared_ptr<Piece> newPiece, Location end){	
 	vector<unique_ptr<const BoardEdit>> editSequence;
-	editSequence.emplaceBack(make_unique<const PieceRemove>(piece));
-	editSequence.emplaceBack(make_unique<const PieceAdd>(piece, end)); 
+	editSequence.emplaceBack(make_unique<const PieceRemove>(pawn));
+	editSequence.emplaceBack(make_unique<const PieceAdd>(newPiece, end)); 
 
 	setEditSequence(move(editSequence));
 }

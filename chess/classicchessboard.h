@@ -6,7 +6,6 @@
 class ClassicChessBoard: public ChessBoard{
 	public:
 	ClassicChessBoard();
-	~ClassicChessBoard();
 };
 
 #endif

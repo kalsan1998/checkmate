@@ -15,7 +15,8 @@ EnPassant::EnPassant(shared_ptr<Pawn> pawn1, shared_ptr<Pawn> pawn2, Location pa
 	setEditSequence(move(editSequence));
 }
 
-EnPassant::EnPassant(EnPassant &&other): ChessMove(other){}
+EnPassant::EnPassant(EnPassant &&other): ChessMove(move(other)){}
 EnPassant &EnPassant::operator=(EnPassant &&other){
-	ChessMove::operator=(other);
+	ChessMove::operator=(move(other));
+	return *this;
 }

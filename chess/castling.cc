@@ -18,7 +18,8 @@ Castling::Castling(shared_ptr<King> king, shared_ptr<Rook> rook, Location kingEn
 	setEditSequence(move(editSequence));
 }
 
-Castling::Castling(Castling &&other): ChessMove(other){}
+Castling::Castling(Castling &&other): ChessMove(move(other)){}
 Castling &Castling::operator=(Castling &&other){
-	ChessMove::operator=(other);
+	ChessMove::operator=(move(other));
+	return *this;
 }

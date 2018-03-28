@@ -4,15 +4,15 @@
 #include "chessmove.h"
 
 class Piece;
-class shared_ptr<T>;
+class std::shared_ptr<Piece>;
 struct Location;
 
 class StandardMove: public ChessMove{
 	public:
-	StandardMove(shared_ptr<Piece> piece, Location end);
+	StandardMove(std::shared_ptr<Piece> piece, Location end);
 	StandardMove(StandardMove &&other) noexcept;
 	StandardMove &operator=(StandardMove &&other) noexcept;
-}
+};
 
 
 #endif 

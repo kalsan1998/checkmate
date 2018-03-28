@@ -1,6 +1,6 @@
 #include "gamecontroller.h"
 #include "classicchessboard.h"
-#include "pieceinfo.h"
+#include "piecefactory"
 #include "location.h"
 #include "pieceadd.h"
 #include "pieceremove.h"
@@ -40,21 +40,22 @@ void GameController::setupMode(){
 			break;
 		//add a piece
 		}else if(cmd == "+"){
-			string pieceStr;
+			char pieceChar;
 			string locationStr;
 			//get the piece type and location, then execute
-			if((in >> piece) && (in >> location)){
-				PieceInfo pieceInfo = PieceInfo::parse(pieceStr);
-				Location location = Location::parse(locationStr);
-				board->executeEdit(PieceAdd{location, pieceInfo});
+			if((in >> pieceChar) && (in >> location)){
+				shared_ptr<Piece> piece = make_shared<Piece>{PieceFactory::generatePiece(pieceChar)};
+				Location location = Location{locationStr};
+				board->executeEdit(PieceAdd{location, piece});
 			}
 		//remove a piece
 		}else if(cmd == "-"){
 			string locationStr;
 			//get location then execute command to remove
 			if(in >> locationStr){
-				Location location = Location::parse(locationStr);
-				board->executeEdit(PieceRemove{location});
+				Location location{locationStr};
+				shared_ptr<Piece> piece = board->getPieceAt(location);
+				board->executeEdit(PieceRemove{piece});
 			}
 		}else if(cmd == "="){
 			string colourStr;

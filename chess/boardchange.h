@@ -1,9 +1,6 @@
 #ifndef BOARD_CHANGE_H
 #define BOARD_CHANGE_H
 
-#include "pieceinfo.h"
-#include <memory>
-
 class ChessBoard;
 
 class BoardChange{

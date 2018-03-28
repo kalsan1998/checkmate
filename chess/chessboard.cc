@@ -48,7 +48,11 @@ const map<Location, unique_ptr<Piece>> &getBoard() const{
 	return theBoard;
 }
 
-const Piece &ChessBoard::getPieceAt(Location location) const{
+bool ChessBoard::ChessBoard(const Location &location) const{
+	return theBoard.find(location) != theBoard.end();
+}
+
+const Piece &ChessBoard::getPieceAt(const Location &location) const{
 	return *(theBoard.get(location).get());
 }
 

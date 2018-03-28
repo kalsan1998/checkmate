@@ -15,7 +15,7 @@ struct Location;
 class ChessBoard{
 	friend BoardChange;
 
-	std::map<Colour, std::map<PieceType, std::vector<const Piece *>> piecesMap;
+	std::map<Colour, std::map<PieceType, std::vector<shared_ptr<const Piece>>> piecesMap;
 	std::vector<BoardObserver *> observers;
 	std::stack<shared_ptr<const ChessMove>> executedMoves;
 	std::map<Colour, std::vector<std::shared_ptr<const ChessMove>>> legalMoves;
@@ -24,20 +24,21 @@ class ChessBoard{
 	std::shared_ptr<const ChessMove> getLastMove() const;
 
 	protected:
-	std::map<Location, std::unique_ptr<Piece>> theBoard;
+	std::map<Location, std::shared_ptr<Piece>> theBoard;
 
 	public:
-	const std::map<Location, std::unique_ptr<Piece>> &getBoard() const;
+	const std::map<Location, std::shared_ptr<Piece>> &getBoard() const;
 	
 	void attachObserver(BoardObserver *obs);
 	void detachObserver(BoardObserver *obs);
 	void notifyObservers();
-
-	const Piece &getPieceAt(const Location location) const; //get the Piece at a location on the board
+	
+	bool isInBounds(const Location &location) const; //returns true if location is valid on the board
+	const Piece &getPieceAt(const Location &location) const; //get the Piece at a location on the board
 	const std::vector<std::shared_ptr<const ChessMove>> &getLegalMoves(const Colour colour) const; //returns all legal moves for a player
 	
 	void executeEdit(const BoardEdit &edit); //Executes a add/removal without updating state
-	void executeChessMove(const shared_ptr<const ChessMove> move); //Execute a move and updates state + store move
+	void executeChessMove(shared_ptr<const ChessMove> move); //Execute a move and updates state + store move
 	void undo(); //undoes the last move executed
 
 	bool isStaleMate(const Colour turn); //returns true if turn has no legal moves left

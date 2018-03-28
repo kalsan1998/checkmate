@@ -17,7 +17,8 @@ StandardMove::StandardMove(shared_ptr<Piece> piece, shared_ptr<Piece> captured){
 	setEditSequence(move(editSequence));
 }
 
-StandardMove::StandardMove(StandardMove &&other): ChessMove(other){}
+StandardMove::StandardMove(StandardMove &&other): ChessMove(move(other)){}
 StandardMove &StandardMove::operator=(StandardMove &&other){
-	ChessMove::operator=(other);
+	ChessMove::operator=(move(other));
+	return *this;
 }
