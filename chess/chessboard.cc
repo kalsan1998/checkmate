@@ -53,11 +53,11 @@ bool ChessBoard::ChessBoard(const Location &location) const{
 }
 
 const Piece &ChessBoard::getPieceAt(const Location &location) const{
-	return *(theBoard.get(location).get());
+	return *(theBoard[location].get());
 }
 
 const vector<shared_ptr<ChessMove>> &ChessBoard::getLegalMoves(const Colour colour) const{
-	return legalMoves.get(colour); 
+	return legalMoves[colour]; 
 }
 
 void ChessBoard::executeEdit(const BoardEdit &edit){
@@ -66,8 +66,12 @@ void ChessBoard::executeEdit(const BoardEdit &edit){
 
 void ChessBoard::executeChessMove(const shared_ptr<const ChessMove> move){
 	if(isMoveValid(*move)){
-		//execute the move, then notify observers, then add this to the stacl
+		//execute the move, then notify observers, then add this to the stack
 		move->execute(*this);
+		//clear all legal moves
+		for(auto &pair : legalMoves){
+			p.second.clear();
+		}
 		notifyObservers();
 		executedMoves.push(move);
 	}else{

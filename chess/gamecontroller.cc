@@ -36,33 +36,39 @@ void GameController::setTurn(Colour colour){
 void GameController::setupMode(){
 	string cmd;
 	while(in >> cmd){
-		if(cmd == "done"){
-			break;
-		//add a piece
-		}else if(cmd == "+"){
-			char pieceChar;
-			string locationStr;
-			//get the piece type and location, then execute
-			if((in >> pieceChar) && (in >> location)){
-				shared_ptr<Piece> piece = make_shared<Piece>{PieceFactory::generatePiece(pieceChar)};
-				Location location = Location{locationStr};
-				board->executeEdit(PieceAdd{location, piece});
+		try{
+			if(cmd == "done"){
+				break;
+			//add a piece
+			}else if(cmd == "+"){
+				char pieceChar;
+				string locationStr;
+				//get the piece type and location, then execute
+				if((in >> pieceChar) && (in >> location)){
+					shared_ptr<Piece> piece = make_shared<Piece>{PieceFactory::generatePiece(pieceChar)};
+					Location location = Location{locationStr};
+					board->executeEdit(PieceAdd{location, piece});
+					board->notifyObservers();
+				}
+			//remove a piece
+			}else if(cmd == "-"){
+				string locationStr;
+				//get location then execute command to remove
+				if(in >> locationStr){
+					Location location{locationStr};
+					shared_ptr<Piece> piece = board->getPieceAt(location);
+					board->executeEdit(PieceRemove{piece});
+					board->notifyObservers();
+				}
+			}else if(cmd == "="){
+				string colourStr;
+				if(in >> colourStr){
+					Colour colour = Colour::parse(colour);
+					setTurn(colour);
+				}
 			}
-		//remove a piece
-		}else if(cmd == "-"){
-			string locationStr;
-			//get location then execute command to remove
-			if(in >> locationStr){
-				Location location{locationStr};
-				shared_ptr<Piece> piece = board->getPieceAt(location);
-				board->executeEdit(PieceRemove{piece});
-			}
-		}else if(cmd == "="){
-			string colourStr;
-			if(in >> colourStr){
-				Colour colour = Colour::parse(colour);
-				setTurn(colour);
-			}
+		}catch(Exception &e){
+			out << e.what() << endl;
 		}
 	}
 }
@@ -85,8 +91,8 @@ void GameController::runGame(){
 				shared_ptr<PieceMove> move = currentPlayer->getMove();
 				board->executeChessMove(move);
 				nextTurn();
-			}catch(InvalidMove &e){
-				out << e.getMessage() << endl;
+			}catch(Exception &e){
+				out << e.what() << endl;
 			}
 		}else if(cmd == "resign"){
 			//the next player is displayed as the winner
@@ -94,7 +100,7 @@ void GameController::runGame(){
 		}
 	}
 	if(winner != Colour::NO_COLOUR){
-		out << colourToString() + " wins!" << endl;
+		out << (colour == Colour::BLACK ? "Black" : "White") + " wins!" << endl;
 	}
 }
 
