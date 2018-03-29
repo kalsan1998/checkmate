@@ -10,7 +10,17 @@ struct Location{
 	char col;
 	int row;
 	Location(string loc);
+	Location(int col, int row);
+	Location(const Location &other);
+	Location &operator=(const Location &other);
+
 	//returns true if this is directly horizontal/vertical/diagonal to the other location
 	bool isInLine(const Location &location) const;
+
+	bool operator==(const Location &other);
+	bool operator+(const Location &other);
+	bool operator-(const Location &other);
+	bool operator+=(const Location &other);
+	bool operator-=(const Location &other);
 };
 #endif

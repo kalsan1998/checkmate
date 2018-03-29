@@ -44,12 +44,16 @@ void ChessBoard::detachObserver(BoardObserver *obs){
 	}
 }
 
-const map<Location, unique_ptr<Piece>> &getBoard() const{
+const map<Location, unique_ptr<Piece>> &ChessBoard::getBoard() const{
 	return theBoard;
 }
 
-bool ChessBoard::ChessBoard(const Location &location) const{
-	return theBoard.find(location) != theBoard.end();
+const map<PieceType, unique_ptr<Piece>> &ChessBoard::getPieces(Colour colour) const{
+	return piecesMap[colour]; 
+}
+
+bool ChessBoard::isInBounds(const Location &location) const{
+	return theBoard.count(location) == 1;
 }
 
 const Piece &ChessBoard::getPieceAt(const Location &location) const{

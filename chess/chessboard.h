@@ -20,14 +20,15 @@ class ChessBoard{
 	std::stack<shared_ptr<const ChessMove>> executedMoves;
 	std::map<Colour, std::vector<std::shared_ptr<const ChessMove>>> legalMoves;
 	
-	bool isMoveLegal(const ChessMove &move) const;
+	bool isMoveLegal(const ChessMove &move) const; //checks if the given move is legal
 	std::shared_ptr<const ChessMove> getLastMove() const;
 
 	protected:
 	std::map<Location, std::shared_ptr<Piece>> theBoard;
 
 	public:
-	const std::map<Location, std::shared_ptr<Piece>> &getBoard() const;
+	const std::map<Location, std::shared_ptr<Piece>> &getBoard() const; //returns the board
+	const std::map<PieceType, std::shared_ptr<Piece>> &getPiece(Colour colour) const; //gets the pieces for a colour
 	
 	void attachObserver(BoardObserver *obs);
 	void detachObserver(BoardObserver *obs);

@@ -24,7 +24,7 @@ class Piece: public BoardObserver{
 
 	//returns true if there is a queen/bishop/rook that would
 	//check the king if this piece were removed
-	bool isBlockingCheck(Board &board) const;
+	bool isBlockingCheck(ChessBoard &board) const;
 	
 	public:
 	Colour getColour() const;
@@ -35,7 +35,7 @@ class Piece: public BoardObserver{
 
 	//this will get all the valid moves on the board, then
 	//update the board's legal moves
-	void notify(Board &board) override;
+	void notify(ChessBoard &board) override;
 };
 
 #endif
