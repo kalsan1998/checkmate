@@ -6,7 +6,7 @@
 #include <memory>
 using namespace std;
 
-PawnDouble::PawnDouble(shared_ptr<Pawn> pawn, Location){
+PawnDouble::PawnDouble(shared_ptr<Pawn> pawn, Location): ChessBoard{pawn}{
 	vector<unique_ptr<const BoardEdit>> editSequence;
 	editSequence.emplace_back(make_unique<const PieceRemove>(pawn));
 	editSequence.emplace_back(make_unique<const PieceAdd>(pawn, end)); 
@@ -14,7 +14,3 @@ PawnDouble::PawnDouble(shared_ptr<Pawn> pawn, Location){
 	setEditSequence(move(editSequence));
 }
 	
-void PawnDouble::executeReverse(ChessBoard &board){
-	ChessMove::executeReverse(board);
-	pawn.setFirstMove(true);
-}

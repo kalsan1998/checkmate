@@ -17,8 +17,12 @@ ClassicChessBoard::ClassicChessBoard(){
 
 	for(col = 'a'; col <= 'h'; ++col){
 		//add the Pawns
-		executeEdit(PieceAdd{Location{col, whitePawnRow}, PieceFactory::generatePiece('P')}); 
-		executeEdit(PieceAdd{Location{col, blackPawnRow}, PieceFactory::generatePiece('p')}); 
+		shared_ptr<Pawn> whitePawn = PieceFactory::generatePiece('P');
+		shared_ptr<Pawn> blackPawn = PieceFactory::generatePiece('p');
+		executeEdit(PieceAdd{Location{col, whitePawnRow}, whitePawn);
+		executeEdit(PieceAdd{Location{col, blackPawnRow}, blackPawn);
+		attachObserver(whitePawn);
+		attachObserver(blackPawn);
 		
 		//determine the bigger piece type based on column
 		char type = '-';
@@ -36,11 +40,14 @@ ClassicChessBoard::ClassicChessBoard(){
 		//execute the edit, this will handle adding piece to 
 		//the board and the pieces map
 		//Add white
-		executeEdit(PieceAdd{Location{col, whiteBigPieceRow}, PieceFactory::generatePiece(type - 32)}});
-		//Add black
-		executeEdit(PieceAdd{Location{col, blackBigPieceRow}, PieceFactory::generatePiece(type)});
+		shared_ptr<Piece> whitePiece = PieceFactory::generatePiece(type - 32);
+		shared_ptr<Piece> blackPiece = PieceFactory::generatePiece(type);
+		executeEdit(PieceAdd{Location{col, whiteBigPieceRow}, whitePiece);
+		executeEdit(PieceAdd{Location{col, blackBigPiecenRow}, blackPiece);
+		attachObserver(whitePiece);
+		attachObserver(blackPiece);
 	}
-	//notify all the pawns to get the legal moves
+	//notify all the pieces to get the legal moves
 	notifyObservers();
 }
 

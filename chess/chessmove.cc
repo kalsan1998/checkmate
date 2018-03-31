@@ -4,16 +4,20 @@ using namespace std;
 
 ChessMove::~ChessMove(){}
 
+ChessMove::ChessMove(shared_ptr<Piece> pieceMoved): pieceMoved{pieceMoved}{}
+
 void ChessMove::executeReverse(ChessBoard &board) const{
 	for(auto it = editSequence.rbegin(); it != editSequence.rend(); ++it){
 		(*it)->executeReverse(board);
 	}
+	--(pieceMoved->getMoveCount());
 }
 
 void ChessMove::execute(ChessBoard &board) const{
 	for(auto it = editSequence.begin(); it != editSequence.end(); ++it){
 		(*it)->execute(board);
 	}
+	++(pieceMoved->getMoveCount());
 }
 
 bool ChessMove::operator==(const ChessMove &move) const{

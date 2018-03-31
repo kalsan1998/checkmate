@@ -28,11 +28,15 @@ void ChessBoard::notifyObservers() const{
 	for(auto obs : observers){
 		obs->notify(*this);
 	}
+	for(auto &p: piecesMap){
+		//kings need to update their moves last so they can see all the squares in danger
+		getKing(p.first).kingNotify(*this);
+	}
+
 }
 
-void ChessBoard::attachObserver(BoardObserver *obs){
+void ChessBoard::attachObserver(shared_ptr<BoardObserver> obs){
 	observers.emplace_back(obs);
-	obs->notify(*this);
 }
 
 void ChessBoard::detachObserver(BoardObserver *obs){
@@ -100,18 +104,25 @@ void ChessBoard::undo(){
 	notifyObservers();
 }
 
-bool ChessBoard::isStalemate(const Colour turn){
+bool ChessBoard::isLocationSafe(const Location &location, const Colour colour) const{
+	const vector<shared_ptr<Piece>> &threats = getPieceAt(location)->getThreats();
+	for(auto it : threats){
+		if((*it)->getColour() != turn) return true;
+	}
+	return false;
+}
+
+bool ChessBoard::isCheck(const Colour turn) const{
+	shared_ptr<King> king = piecesMap[turn][PieceType::KING].front();
+	return isLocationSafe(king->getLocation(), turn);
+}
+
+bool ChessBoard::isStalemate(const Colour turn) const{
 	return getLegalMoves(turn).size() == 0;
 }
 
-bool ChessBoard::isCheckmate(const Colour turn){
-	shared_ptr<King> king = piecesMap[turn][PieceType::KING].front();
-	if(king->getThreats() > 0){
-		if(isStalemate(turn)){
-			return true;
-		}
-	}
-	return false;
+bool ChessBoard::isCheckmate(const Colour turn) const{
+	return isCheck(turn) && isStaleMate(turn);
 }
 
 

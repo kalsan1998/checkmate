@@ -12,7 +12,5 @@ class PawnDouble: public ChessMove{
 	PawnDouble(std::shared_ptr<Pawn> pawn, Location end);
 	PawnDouble(PawnDouble &&other) noexcept;
 	PawnDouble &operator=(PawnDouble &&other) noexcept;
-
-	void executeReverse(ChessBoard &board) const override;
 };
 #endif

@@ -9,10 +9,16 @@ class Pawn;
 struct Location;
 
 class PawnEnd: public ChessMove{
+	std::shared_ptr<Pawn> pawn;
+	std::shared_ptr<Piece> newPiece;
+
 	public:
 	PawnEnd(std::shared_ptr<Pawn> pawn, std::shared_ptr<Piece> newPiece, Location end);
 	PawnEnd(PawnEnd &&other) noexcept;
 	PawnEnd &operator=(PawnEnd &&other) noexcept;
+
+	void execute(Board &board) const;
+	void executeReverse(Board &board) const;
 };
 
 

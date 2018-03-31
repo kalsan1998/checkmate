@@ -19,12 +19,30 @@ int Piece::getValue() const{
 	return value;
 }
 
+int &getMoveCount() const{
+	return moveCount;
+}
+
 Location Piece::getLocation() const{
 	return location;
 }
 
 void Piece::setLocation(const Location &otherLocation){
 	location = otherLocation;
+	++moveCount;
+}
+
+vector<shared_ptr<Piece>> &Piece::getMoveableSquares() const{
+	return moveableSquares;
+}
+
+void Piece::clearMoveableSquares{
+	moveableSquares.clear();
+}
+
+void Piece::addMoveableSquare(shared_ptr<Piece> square){
+	moveableSquares.emplace_back(square);
+	square->addThreat(make_shared<Piece>(this));
 }
 
 void Piece::clearThreats(){
@@ -33,6 +51,10 @@ void Piece::clearThreats(){
 
 void Piece::addThreat(shared_ptr<Piece> threat){
 	threats.emplace_back(threat);
+}
+
+const vector<shared_ptr<Piece>> &getThreats() const{
+	return threats;
 }
 
 bool Piece::isEmpty() const{
@@ -52,7 +74,7 @@ bool Piece::operator==(const Piece &other) const{
 void Piece::notify(ChessBoard &board){
 	updateLegalMoves(board);
 	//add this pieces legal moves to the board's legal moves
-	vector<shared_ptr<const ChessMove>> boardLegalMoves = board.getLegalMoves(colour);
+	vector<shared_ptr<const ChessMove>> &boardLegalMoves = board.getLegalMoves(colour);
 	legalMoves.insert(legalMoves.end(), legalMoves.begin(), legalMoves.end()); 
 }
 

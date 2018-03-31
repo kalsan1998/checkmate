@@ -16,7 +16,8 @@
 using namespace std;
 
 Pawn::Pawn(Colour colour, Location direction): 
-	Piece{PieceType::PAWN, colour, 1, false, false}, movementDirection{direction}{
+	Piece{PieceType::PAWN, colour, 1, false, false}, movementDirection{direction},
+	boardEndPieces{make_shared<Queen>(colour), make_shared<Rook>(colour), make_shared<Bishop>(colour), make_shared<Queen>(colour)}{
 	if(movementDirection.isInLine(Location{0,1})){
 		sideDirection = Location{1, 0};
 	}else{
@@ -24,18 +25,9 @@ Pawn::Pawn(Colour colour, Location direction):
 	}
 }
 
-void Pawn::setFirstMove(bool b){
-	firstMove = b;
-}
-
-void Pawn::setLocation(const Location &location){
-	firstMove = false;
-	Piece::setLocation(location);
-}
-
 void Pawn::checkStandardMoves(const ChessBoard &board){
 	shared_ptr<Pawn> sharedThis{this};
-	Location oneForward =getLocation() + movementDirection;
+	Location oneForward = getLocation() + movementDirection;
 	Location twoForward = oneForward + movementDirection;
 		
 	//standard forward move
@@ -44,18 +36,17 @@ void Pawn::checkStandardMoves(const ChessBoard &board){
 			legalMoves.emplace_back(make_shared<StandardMove>(sharedThis, oneForward));
 			
 			//double forward for first move
-			if(firstMove){
+			if(!(moveCount > 1)){
 				if(board.getPieceAt(twoForward)->isEmpty()){
 					legalMoves.emplace_back(make_shared<PawnDouble>(sharedThis, oneForward));
 				}
 			}
 			//pawn reaching end
 			if(!board.isInBounds(twoForward)){
-/*				legalMoves.emplace_back(make_shared<PawnEnd>(sharedThis, make_shared<Queen>(colour), oneForward));
-				legalMoves.emplace_back(make_shared<PawnEnd>(sharedThis, make_shared<Rook>(colour), oneForward));
-				legalMoves.emplace_back(make_shared<PawnEnd>(sharedThis, make_shared<Bishop>(colour), oneForward));
-				legalMoves.emplace_back(make_shared<PawnEnd>(sharedThis, make_shared<Knight>(colour), oneForward));
-*/			}
+				for(auto it : boardEndPieces){
+					legalMoves.emplace_back(make_shared<PawnEndCapture>(sharedThis, *it, oneForward));
+				}
+			}
 		}
 	}	
 }
@@ -74,22 +65,16 @@ void Pawn::checkCaptureMoves(const ChessBoard &board){
 		Location diag = diags[i];
 		if(isMoveOk(board, diag)){
 			shared_ptr<Piece> piece = board.getPieceAt(diag);
-			
+			addMoveableSquare(piece);
 			//piece is capturable
-			if(!piece->isEmpty() && (piece->getColour() != getColour())){	
-				piece->addThreat(sharedThis);
-				
+			if((piece->getColour() != getColour()) && (!piece->isEmpty())){	
 				//capture piece and make it to end
 				if(!board.isInBounds(twoForward)){	
-	/*				legalMoves.emplace_back(make_shared<PawnEndCapture>(sharedThis, piece, make_shared<Queen>(colour)));
-					legalMoves.emplace_back(make_shared<PawnEndCapture>(sharedThis, piece, make_shared<Rook>(colour)));
-					legalMoves.emplace_back(make_shared<PawnEndCapture>(sharedThis, piece, make_shared<Bishop>(colour)));
-					legalMoves.emplace_back(make_shared<PawnEndCapture>(sharedThis, piece, make_shared<Knight>(colour)));
-	*/			//just capture
+					for(auto it : boardEndPieces){
+						legalMoves.emplace_back(make_shared<PawnEndCapture>(sharedThis, piece, *it));
+					}
+				//just capture
 				}else{
-					legalMoves.emplace_back(make_shared<Capture>(sharedThis, piece));
-					legalMoves.emplace_back(make_shared<Capture>(sharedThis, piece));
-					legalMoves.emplace_back(make_shared<Capture>(sharedThis, piece));
 					legalMoves.emplace_back(make_shared<Capture>(sharedThis, piece));
 				}
 			}
@@ -121,7 +106,7 @@ void Pawn::checkEnPassantMoves(const ChessBoard &board){
 }
 
 void Pawn::updateLegalMoves(const ChessBoard &board){
-	capturablePieces.clear();
+	clearMoveableSquares();
 	legalMoves.clear();
 	checkStandardMoves(board);
 	checkCaptureMoves(board);

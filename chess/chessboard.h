@@ -22,7 +22,7 @@ class ChessBoard{
 	friend PieceRemove;
 
 	std::map<Colour, std::map<PieceType, std::vector<std::shared_ptr<const Piece>>>> piecesMap;
-	std::vector<BoardObserver *> observers;
+	std::vector<std::shared_ptr<BoardObserver>> observers;
 	std::stack<std::shared_ptr<const ChessMove>> executedMoves;
 	std::map<Colour, std::vector<std::shared_ptr<const ChessMove>>> legalMoves;
 	
@@ -49,8 +49,10 @@ class ChessBoard{
 	void executeChessMove(std::shared_ptr<const ChessMove> move); //Execute a move and updates state + store move
 	void undo(); //undoes the last move executed
 
-	bool isStaleMate(const Colour turn); //returns true if turn has no legal moves left
-	bool isCheckmate(const Colour turn); //returns true if the person whose turn it is is checkmated
+	bool isLocationSafe(const Location &location, const Colour colour); //returns true if the location has no opponents threatening it
+	bool isCheck(const Colour turn) const; //returns true if turn is in check
+	bool isStaleMate(const Colour turn) const; //returns true if turn has no legal moves left
+	bool isCheckmate(const Colour turn) const; //returns true if the person whose turn it is is checkmated
 	
 	virtual ~ChessBoard() = 0;
 };
