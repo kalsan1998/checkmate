@@ -12,9 +12,39 @@ using namespace std;
 King::King(Colour colour): Piece{PieceType::KING, colour, INT_MAX, false false}{}
 
 void King::checkCastlingMoves(const ChessBoard &board){
+	shared_ptr<King> sharedThis{this};
+	//castling is only availbale if king has not moved yet and is not in check
+	if(!(moveCount > 1) && !(board.isCheck(getColour()))){
+		//go over all the rooks
+		vector<shared_ptr<Piece>> &rooks = board.getPieces(colour)[PieceType::ROOK];
+		for(auto &rook : rooks){
+			//check if rook moved first
+			if(!(rook->getMoveCount() > 1)){
+				Location rookLocation = rook->getLocation();
+				Location direction = location.getRelativeDirection(rookLocation);
+				
+				//check both squares in direction of rook
+				Location newLocation = location;
+				bool castlingEnabled = true;
+				
+				for(int i = 0; i < 2; ++i){
+					newLocation += direction;
+					//if one of the two squares arent safe then caslting is invalid
+					if(!board.isLocationSafe(newLocation, colour)){
+						castlingEnabled = false;
+						break;
+					}
+				}
+				if(castlingEnabled){
+					legalMoves.emplace_back(make_shared<Castling>(sharedThis, rook, newLocation, newLocation - direction));
+				}
+			}
+		}
+	}
 }
 
 void King::checkStandardMoves(const ChessBoard &board){
+	shared_ptr<King> sharedThis{this};
 	vector<shared_ptr<Piece>> &moveableSqrs = getMovableSquares();
 	for(auto piece : moveableSqrs){
 		//regular move
@@ -29,7 +59,6 @@ void King::checkStandardMoves(const ChessBoard &board){
 
 void King::notify(ChessBoard &board){
 	clearMoveableSquares();
-	shared_ptr<King> sharedThis{this};
 	for(int row = -1; row < 2; ++row){
 		for(int col = -1; col <2; ++col){
 			if((col != 0) || (row != 0)){
@@ -42,10 +71,14 @@ void King::notify(ChessBoard &board){
 	}
 }
 
-void King::kingNotify(ChessBoard &board){
+void King::updateLegalMoves(ChessBoard &board){
 	notify();
 	legalMoves.clear();
 	checkStandardMoves(board);
 	checkCastlingMoves(board);
+}
+
+void King::kingNotify(Chessboard &board){
+	Piece::notify(board);
 }
 

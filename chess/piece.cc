@@ -88,18 +88,14 @@ bool Piece::isBlockingCheck(const ChessBoard &board) const{
 	//that is along the line 
 	if(location.isInLine(kingLocation)){
 		//get relative direction 
-		int vertDir = kingLocation.row == location.row ? 0 : 1;
-		vertDir *= location.row < kingLocation.row  ? -1 : 1;
-		int horzDir = kingLocation.col == location.col ? 0 : 1;
-		horzDir *= location.col < kingLocation.col  ? -1 : 1;
+		Location lineDirection = kingLocation.getRelativeDirection(location);
 		
-		Location lineDirection{horzDir, vertDir};
 		//iterate along line to see if theres anypiece between this and the king
 		//if a piece is found between them then this piece can move without worrying about 
 		//opening a check
 		int horz = kingLocation.col + horzDir;
 		int vert = kingLocation.row + vertDir;
-		Location currLocation{horz, vert};
+		Location currLocation = kingLocation + lineDirection;
 		while(currLocation != location){
 			if(board.getPieceAt(currLocation)->isEmpty()) return false;
 			currLocation += lineDirection;
@@ -112,9 +108,9 @@ bool Piece::isBlockingCheck(const ChessBoard &board) const{
 			//non empty piece found: check if its a piece that can attack the king
 			if(currPiece->isEmpty()){				
 				if(currPiece->isStraightMover()){
-					return (horzDir * vertDir) == 0; //not diagonal
+					return (lineDirection.col * lineDirection.row) == 0; //not diagonal
 				}else if(currPiece->isDiagonalMover()){
-					return (horzDir * vertDir) != 0; //diagonal
+					return (lineDirection.col * lineDirection.row) != 0; //diagonal
 				}else{
 					return false;
 				}

@@ -53,7 +53,7 @@ const map<Location, shared_ptr<Piece>> &ChessBoard::getBoard() const{
 	return theBoard;
 }
 
-const map<PieceType, shared_ptr<Piece>> &ChessBoard::getPieces(Colour colour) const{
+const map<PieceType, vector<shared_ptr<Piece>>> &ChessBoard::getPieces(Colour colour) const{
 	return piecesMap[colour]; 
 }
 

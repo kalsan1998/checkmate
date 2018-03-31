@@ -32,6 +32,15 @@ bool Location::isInLine(const Location &location) const{
 	return (colDiff == 0) || (rowDiff == 0) || (rowDiff == col);
 }
 
+Location Location::getRelativeDirection(const Location &other) const{
+	int vertDir = other.row == location.row ? 0 : 1;
+	vertDir *= location.row < other.row  ? -1 : 1;
+	int horzDir = other.col == location.col ? 0 : 1;
+	horzDir *= location.col < other.col  ? -1 : 1;
+	
+	return Location{vertDir, horzDir};
+}
+
 bool Location::operator<(const Location &other) const{
 	if(col < other.col) return true;
 	if(col > other.col) return false;

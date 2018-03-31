@@ -33,7 +33,7 @@ class ChessBoard{
 
 	public:
 	const std::map<Location, std::shared_ptr<Piece>> &getBoard() const; //returns the board
-	const std::map<PieceType, std::shared_ptr<Piece>> &getPieces(Colour colour) const; //gets the pieces for a colour
+	const std::map<PieceType, std::vector<std::shared_ptr<Piece>>> &getPieces(Colour colour) const; //gets the pieces for a colour
 	const King &getKing(const Colour colour) const;
 	
 	void attachObserver(BoardObserver *obs);

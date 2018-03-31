@@ -24,12 +24,13 @@ PawnEnd &PawnEnd::operator=(PawnEnd &&other){
 
 void PawnEnd::execute(ChessBoard &board) const{
 	ChessMove::execute(board);
-	board.detach(pawn);
-	board.attach(newPiece);
+	newPiece->getMoveCount() = pawn->getMoveCount();
+	board.detachObserver(pawn);
+	board.attachObserver(newPiece);
 }
 
 void PawnEnd::executeReverse(ChessBoard &board) const{
 	ChessMove::executeReverse(board);
-	board.detach(newPiece);
-	board.attach(pawn);
+	board.detachObserver(newPiece);
+	board.attachObserver(pawn);
 }

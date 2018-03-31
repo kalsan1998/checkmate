@@ -20,6 +20,8 @@ PawnEndCapture::PawnEndCapture(shared_ptr<Pawn> pawn, shared_ptr<Piece> captured
 
 void PawnEndCapture::execute(ChessBoard &board) const{
 	ChessMove::execute(board);
+	//update move count for the new piece
+	newPiece->getMoveCount() = pawn->getMoveCount();
 	detachObserver(pawn);
 	detachObserver(captured);
 	attachObserver(newPiece);

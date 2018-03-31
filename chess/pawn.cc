@@ -6,11 +6,10 @@
 #include "chessboard.h"
 #include "pawnendcapture.h"
 #include "standardmove.h"
-/*#include "queen.h"
+#include "queen.h"
 #include "rook.h"
 #include "knight.h"
 #include "bishop.h"
-*/
 #include <memory>
 #include <vector>
 using namespace std;
@@ -63,19 +62,21 @@ void Pawn::checkCaptureMoves(const ChessBoard &board){
 	
 	for(int i = 0; i < 2; ++i){
 		Location diag = diags[i];
-		if(isMoveOk(board, diag)){
+		if(board.isInBounds(diag)){	
 			shared_ptr<Piece> piece = board.getPieceAt(diag);
 			addMoveableSquare(piece);
-			//piece is capturable
-			if((piece->getColour() != getColour()) && (!piece->isEmpty())){	
-				//capture piece and make it to end
-				if(!board.isInBounds(twoForward)){	
-					for(auto it : boardEndPieces){
-						legalMoves.emplace_back(make_shared<PawnEndCapture>(sharedThis, piece, *it));
+			if(isMoveOk(board, diag)){
+				//piece is capturable
+				if((piece->getColour() != getColour()) && (!piece->isEmpty())){	
+					//capture piece and make it to end
+					if(!board.isInBounds(twoForward)){	
+						for(auto it : boardEndPieces){
+							legalMoves.emplace_back(make_shared<PawnEndCapture>(sharedThis, piece, *it));
+						}
+					//just capture
+					}else{
+						legalMoves.emplace_back(make_shared<Capture>(sharedThis, piece));
 					}
-				//just capture
-				}else{
-					legalMoves.emplace_back(make_shared<Capture>(sharedThis, piece));
 				}
 			}
 		}

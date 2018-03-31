@@ -19,6 +19,8 @@ struct Location{
 
 	//returns true if this is directly horizontal/vertical/diagonal to the other location
 	bool isInLine(const Location &location) const;
+	//returns a 'unit location' in the direction from this to other
+	Location getRelativeDirection(const Location &other) const;
 
 	bool operator==(const Location &other) const;
 	bool operator!=(const Location &other) const;
