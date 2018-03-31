@@ -3,9 +3,9 @@
 
 #include "boardedit.h"
 #include "location.h"
+#include <memory>
 
 class Piece;
-class std::shared_ptr<Piece>;
 
 class PieceRemove: public BoardEdit{
 	Location location;

@@ -16,26 +16,20 @@ void ChessMove::execute(ChessBoard &board) const{
 	}
 }
 
-bool ChessMove::operator==(ChessMove &move){
-	vector<shared_ptr<const BoardEdit>> &otherSeq = move.editSequence;
+bool ChessMove::operator==(const ChessMove &move) const{
+	const vector<unique_ptr<const BoardEdit>> &otherSeq = move.editSequence;
 	if(otherSeq.size() != editSequence.size()) return false;
-	for(int i = 0; i < editSequence.size(); ++i){
+	for(size_t i = 0; i < editSequence.size(); ++i){
 		if(*(editSequence[i]) != *(otherSeq[i])) return false;
 	}
 	return true;
 }
 
-bool ChessMove::operator!=(ChessMove &move){
+bool ChessMove::operator!=(const ChessMove &move) const{
 	return !(*this == move);
 }
 
-ChessMove &ChessMove::operator=(ChessMove &&other){
-	ChessMove tmp{move};
-	swap(editSequence, tmp.editSequence);
-	return *this;
-}
-
-void setEditSequence(vector<unique_ptr<const BoardEdit>> &&sequence){
-	editSequence = sequence;
+void ChessMove::setEditSequence(vector<unique_ptr<const BoardEdit>> &&sequence){
+	editSequence = move(sequence);
 }
 

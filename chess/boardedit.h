@@ -4,14 +4,16 @@
 #include "boardchange.h"
 #include <memory>
 
+class Piece;
+
 class BoardEdit: public BoardChange{
 	protected:
 	BoardEdit(std::shared_ptr<Piece> piece);
-	shared_ptr<Piece> pieceAffected;
+	std::shared_ptr<Piece> pieceAffected;
 
 	public:
-	virtual bool operator==(BoardEdit &edit) const;
-	virtual bool operator!=(BoardEdit &edit) const;
+	virtual bool operator==(const BoardEdit &edit) const;
+	virtual bool operator!=(const BoardEdit &edit) const;
 
 	
 	BoardEdit(BoardEdit &&other) noexcept;

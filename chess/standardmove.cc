@@ -9,8 +9,8 @@ using namespace std;
 
 StandardMove::StandardMove(shared_ptr<Piece> piece, Location end){	
 	vector<unique_ptr<const BoardEdit>> editSequence;
-	editSequence.emplaceBack(make_unique<const PieceRemove>(piece));
-	editSequence.emplaceBack(make_unique<const PieceAdd>(piece, end)); 
+	editSequence.emplace_back(make_unique<const PieceRemove>(piece));
+	editSequence.emplace_back(make_unique<const PieceAdd>(piece, end)); 
 
 	setEditSequence(move(editSequence));
 }

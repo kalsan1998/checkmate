@@ -7,18 +7,18 @@
 using namespace std;
 
 
-StandardMove::StandardMove(shared_ptr<Piece> piece, shared_ptr<Piece> captured){
+Capture::Capture(shared_ptr<Piece> piece, shared_ptr<Piece> captured){
 	vector<unique_ptr<const BoardEdit>> editSequence;
-	editSequence.emplaceBack(make_unique<const PieceRemove>(piece));
-	editSequence.emplaceBack(make_unique<const PieceRemove>(captured));
-	editSequence.emplaceBack(make_unique<const PieceAdd>(piece, captured.getLocation())); 
-	editSequence.emplaceBack(make_unique<const PieceAdd>(captured, piece.getLocation())); 
+	editSequence.emplace_back(make_unique<const PieceRemove>(piece));
+	editSequence.emplace_back(make_unique<const PieceRemove>(captured));
+	editSequence.emplace_back(make_unique<const PieceAdd>(piece, captured.getLocation())); 
+	editSequence.emplace_back(make_unique<const PieceAdd>(captured, piece.getLocation())); 
 
 	setEditSequence(move(editSequence));
 }
 
-StandardMove::StandardMove(StandardMove &&other): ChessMove(move(other)){}
-StandardMove &StandardMove::operator=(StandardMove &&other){
+Capture::Capture(Capture &&other): ChessMove(move(other)){}
+Capture &Capture::operator=(Capture &&other){
 	ChessMove::operator=(move(other));
 	return *this;
 }

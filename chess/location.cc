@@ -1,19 +1,21 @@
 #include "location.h"
+#include <limits.h>
 using namespace std;
 
-const char* InvalidLocationException::what(){
+string InvalidLocationException::what() const{
 	return message; 
 }
 
 Location::Location(string loc){
 	try{
-		col = loc[0];
+		col = static_cast<int>(loc[0]);
 		row = loc[1];
 	}catch(...){
-		throw InvalidLocationException;
+		throw InvalidLocationException{};
 	}
 }
 
+Location::Location(): col{INT_MAX}, row{INT_MAX}{} 
 Location::Location(int col, int row): col{col}, row{row}{}
 Location::Location(const Location &other): col{other.col}, row{other.row}{}
 Location &Location::operator=(const Location &other){
@@ -27,19 +29,29 @@ bool Location::isInLine(const Location &location) const{
 	int rowDiff = row - location.row;
 	
 	//returns true if diagonal, or horizontal, or vertical
-	return (col == 0) || (row == 0) || (row == col);
+	return (colDiff == 0) || (rowDiff == 0) || (rowDiff == col);
 }
 
-bool Location::operator==(const Location &other){
+bool Location::operator<(const Location &other) const{
+	if(col < other.col) return true;
+	if(col > other.col) return false;
+	return (row < other.row);
+}
+
+bool Location::operator==(const Location &other) const{
 	return (col == other.col) && (row == other.row);
 }
 
-Location &&Location::operator+(const Location &other){
-	return Location{col + other.col, row + other.row};
+bool Location::operator!=(const Location &other) const{
+	return (col != other.col) || (row != other.row);
 }
 
-Location &&Location::operator-(const Location &other){
-	return Location{col - other.col, row - other.row};
+Location &&Location::operator+(const Location &other) const{
+	return move(Location{col + other.col, row + other.row});
+}
+
+Location &&Location::operator-(const Location &other) const{
+	return move(Location{col - other.col, row - other.row});
 }
 
 Location &Location::operator+=(const Location &other){

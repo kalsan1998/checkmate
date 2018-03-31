@@ -1,15 +1,18 @@
 #ifndef LOCATION_H
 #define LOCATION_H
-#include<exception>
-class InvalidLocationException: public Exception{
-	string message = "Invalid location format";
-	const char* what() const override;
-}
+
+#include <stdexcept>
+
+class InvalidLocationException{
+	std::string message = "Invalid location format";
+	std::string what() const;
+};
 
 struct Location{
-	char col;
+	int col;
 	int row;
-	Location(string loc);
+	Location();
+	Location(std::string loc);
 	Location(int col, int row);
 	Location(const Location &other);
 	Location &operator=(const Location &other);
@@ -17,10 +20,12 @@ struct Location{
 	//returns true if this is directly horizontal/vertical/diagonal to the other location
 	bool isInLine(const Location &location) const;
 
-	bool operator==(const Location &other);
-	bool operator+(const Location &other);
-	bool operator-(const Location &other);
-	bool operator+=(const Location &other);
-	bool operator-=(const Location &other);
+	bool operator==(const Location &other) const;
+	bool operator!=(const Location &other) const;
+	bool operator<(const Location &other) const;
+	Location &&operator+(const Location &other) const;
+	Location &&operator-(const Location &other) const;
+	Location &operator+=(const Location &other);
+	Location &operator-=(const Location &other);
 };
 #endif

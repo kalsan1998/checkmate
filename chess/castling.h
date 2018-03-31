@@ -11,7 +11,7 @@ struct Location;
 
 class Castling: public ChessMove{
 	public:
-	Castling(std::shared_ptr<King> king, std::shared_ptr<Rook>, Location kingEnd, Location rookEnd);
+	Castling(std::shared_ptr<King> king, std::shared_ptr<Rook> rook, Location kingEnd, Location rookEnd);
 	Castling(Castling &&other) noexcept;
 	Castling &operator=(Castling &&other) noexcept;
 }

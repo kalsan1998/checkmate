@@ -1,15 +1,17 @@
 #include "pieceadd.h"
 #include "pieceremove.h"
+#include "chessboard.h"
 #include "piece.h"
 #include "emptypiece.h"
-#include <stdlib>
+#include <vector>
+#include <memory>
 using namespace std;
 
-PieceRemove::PiecAdd(shared_ptr<Piece> piece): BoardEdit{piece}{}
+PieceRemove::PieceRemove(shared_ptr<Piece> piece): BoardEdit{piece}{}
 
 void PieceRemove::execute(ChessBoard &board) const{
-	board.theBoard[pieceAffected.getLocation()] = make_shared<EmptyPiece>();
-	vector<shared_ptr<Piece>> &pieceVector = board.theBoard[pieceAffected.getColour()][pieceAffected.getType()];
+	board.theBoard[pieceAffected->getLocation()] = make_shared<EmptyPiece>();
+	vector<shared_ptr<const Piece>> &pieceVector = board.piecesMap[pieceAffected->getColour()][pieceAffected->getType()];
 	for(auto it = pieceVector.begin(); it != pieceVector.end(); ++it){
 		//find and remove the piece from the mapping
 		if(*it == pieceAffected){
@@ -20,6 +22,6 @@ void PieceRemove::execute(ChessBoard &board) const{
 }
 
 void PieceRemove::executeReverse(ChessBoard &board) const{
-	PieceAdd{pieceAffected.getLocation(), pieceAffected}.execute();
+	PieceAdd{pieceAffected->getLocation(), pieceAffected}.execute(board);
 }
 

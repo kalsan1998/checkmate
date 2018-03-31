@@ -1,9 +1,13 @@
 #include "piece.h"
+#include "chessboard.h"
+#include "location.h"
+#include "king.h"
 using namespace std;
 
-Piece::Piece(PieceType type, Colour colour, int value): type{type}, colour{colour}, value{value}{}
+Piece::Piece(PieceType type, Colour colour, int value, bool isDiag, bool isStraigt): 
+	type{type}, colour{colour}, value{value}, isDiagonal{isDiag}, isStraight{isStraight} {}
 
-Colour Piece::getColour const{
+Colour Piece::getColour() const{
 	return colour;
 }
 
@@ -12,26 +16,52 @@ PieceType Piece::getType() const{
 }
 
 int Piece::getValue() const{
-	return value
+	return value;
 }
 
 Location Piece::getLocation() const{
 	return location;
 }
 
-Location Piece::setLocation(Location otherLocation) const{
+void Piece::setLocation(const Location &otherLocation){
 	location = otherLocation;
 }
 
-void Piece::notify(ChessBoard &board) override{
-	//add this pieces legal moves to the board's legal moves
-	vector<shared_ptr<ChessMove>> boardLegalMoves = board.getLegalMoves(colour);
-	vector<shared_ptr<ChessMove>> legalMoves = getLegalMoves();
-	legalMoves.insert(legalMoves.end(), legalMoves.start(), legalMoves.end()); 
+void Piece::clearThreats(){
+	threats.clear();
 }
 
-bool Piece::isBlockingCheck(ChessBoard &board){
-	Location kingLocation = board.getPieces(colour)[PieceType::KING].getLocation();
+void Piece::addThreat(shared_ptr<Piece> threat){
+	threats.emplace_back(threat);
+}
+
+bool Piece::isEmpty() const{
+	return type != PieceType::EMPTY_PIECE;
+}
+bool Piece::isDiagonalMover() const{
+	return isDiagonal;
+}
+bool Piece::isStraightMover() const{
+	return isStraight;
+}
+
+bool Piece::operator==(const Piece &other) const{
+	return (colour == other.colour) && (type == other.type) && (location == other.location);
+}
+
+void Piece::notify(ChessBoard &board){
+	updateLegalMoves(board);
+	//add this pieces legal moves to the board's legal moves
+	vector<shared_ptr<const ChessMove>> boardLegalMoves = board.getLegalMoves(colour);
+	legalMoves.insert(legalMoves.end(), legalMoves.begin(), legalMoves.end()); 
+}
+
+const vector<shared_ptr<const ChessMove>> &Piece::getLegalMoves() const{
+	return legalMoves;
+}
+
+bool Piece::isBlockingCheck(const ChessBoard &board) const{
+	Location kingLocation = board.getKing(colour).getLocation();
 	//if theres no piece between this and its king, check if there is a queen/rook/bishop
 	//that is along the line 
 	if(location.isInLine(kingLocation)){
@@ -49,21 +79,19 @@ bool Piece::isBlockingCheck(ChessBoard &board){
 		int vert = kingLocation.row + vertDir;
 		Location currLocation{horz, vert};
 		while(currLocation != location){
-			if(board.getPieceAt(currLocation).getType() != PieceType::EMPTY_PIECE) return false;
+			if(board.getPieceAt(currLocation)->isEmpty()) return false;
 			currLocation += lineDirection;
 		}
 		//if no piece was found between this and the king, continue along the line until
 		//a piece is found or location is out of bounds
-		currLocation{horz, vert} += lineDirection;
-		while(board.isInBounds(currLocation){
-			PieceType currType = board.getPieceAt(currLocation).getType();
+		currLocation += lineDirection;
+		while(board.isInBounds(currLocation)){
+			shared_ptr<Piece> currPiece = board.getPieceAt(currLocation);
 			//non empty piece found: check if its a piece that can attack the king
-			if(currType != PieceType::EMPTY_PIECE){
-				if(type = PieceType::QUEEN){
-					return true;
-				}else if(type == PieceType::ROOK){
+			if(currPiece->isEmpty()){				
+				if(currPiece->isStraightMover()){
 					return (horzDir * vertDir) == 0; //not diagonal
-				}else if(type == PieceType::BISHOP){
+				}else if(currPiece->isDiagonalMover()){
 					return (horzDir * vertDir) != 0; //diagonal
 				}else{
 					return false;
@@ -72,4 +100,8 @@ bool Piece::isBlockingCheck(ChessBoard &board){
 		}
 	}
 	return false;
+}
+
+bool Piece::isMoveOk(const ChessBoard &board, const Location &location) const{
+	return (!isBlockingCheck(board) || board.getKing(colour).getLocation().isInLine(location)) && board.isInBounds(location);
 }

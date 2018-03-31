@@ -1,6 +1,7 @@
 #include "chessboard.h"
 #include "boardobserver.h"
 #include "piece.h"
+#include "king.h"
 #include "location.h"
 #include "boardedit.h"
 #include "chessmove.h"
@@ -44,20 +45,24 @@ void ChessBoard::detachObserver(BoardObserver *obs){
 	}
 }
 
-const map<Location, unique_ptr<Piece>> &ChessBoard::getBoard() const{
+const map<Location, shared_ptr<Piece>> &ChessBoard::getBoard() const{
 	return theBoard;
 }
 
-const map<PieceType, unique_ptr<Piece>> &ChessBoard::getPieces(Colour colour) const{
+const map<PieceType, shared_ptr<Piece>> &ChessBoard::getPieces(Colour colour) const{
 	return piecesMap[colour]; 
 }
 
+const King &ChessBoard::getKing(const Colour colour) const{
+	return piecesMap[colour][PieceType::KING];
+}
+	
 bool ChessBoard::isInBounds(const Location &location) const{
 	return theBoard.count(location) == 1;
 }
 
-const Piece &ChessBoard::getPieceAt(const Location &location) const{
-	return *(theBoard[location].get());
+shared_ptr<Piece> ChessBoard::getPieceAt(const Location &location) const{
+	return theBoard[location];
 }
 
 const vector<shared_ptr<ChessMove>> &ChessBoard::getLegalMoves(const Colour colour) const{
@@ -76,6 +81,10 @@ void ChessBoard::executeChessMove(const shared_ptr<const ChessMove> move){
 		for(auto &pair : legalMoves){
 			p.second.clear();
 		}
+		//clear all threats of pieces
+		for(auto &pair : theBoard){
+			pair.second->clearThreats();
+		}
 		notifyObservers();
 		executedMoves.push(move);
 	}else{
@@ -91,12 +100,12 @@ void ChessBoard::undo(){
 	notifyObservers();
 }
 
-bool isStalemate(const Colour turn){
+bool ChessBoard::isStalemate(const Colour turn){
 	return getLegalMoves(turn).size() == 0;
 }
 
-bool isCheckmate(const Colour turn){
-	King *king = piecesMap.get(turn).get(PieceType::KING).front();
+bool ChessBoard::isCheckmate(const Colour turn){
+	shared_ptr<King> king = piecesMap[turn][PieceType::KING].front();
 	if(king->getThreats() > 0){
 		if(isStalemate(turn)){
 			return true;

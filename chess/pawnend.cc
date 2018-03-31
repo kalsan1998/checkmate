@@ -1,4 +1,4 @@
-#include "standardmove.h"
+#include "pawnend.h"
 #include "piece.h"
 #include "pawn.h"
 #include "location.h"
@@ -8,16 +8,16 @@
 using namespace std;
 
 
-StandardMove::StandardMove(shared_ptr<Pawn> pawn, shared_ptr<Piece> newPiece, Location end){	
+PawnEnd::PawnEnd(shared_ptr<Pawn> pawn, shared_ptr<Piece> newPiece, Location end){	
 	vector<unique_ptr<const BoardEdit>> editSequence;
-	editSequence.emplaceBack(make_unique<const PieceRemove>(pawn));
-	editSequence.emplaceBack(make_unique<const PieceAdd>(newPiece, end)); 
+	editSequence.emplace_back(make_unique<const PieceRemove>(pawn));
+	editSequence.emplace_back(make_unique<const PieceAdd>(newPiece, end)); 
 
 	setEditSequence(move(editSequence));
 }
 
-StandardMove::StandardMove(StandardMove &&other): ChessMove(move(other)){}
-StandardMove &StandardMove::operator=(StandardMove &&other){
+PawnEnd::PawnEnd(PawnEnd &&other): ChessMove(move(other)){}
+PawnEnd &PawnEnd::operator=(PawnEnd &&other){
 	ChessMove::operator=(move(other));
 	return *this;
 }

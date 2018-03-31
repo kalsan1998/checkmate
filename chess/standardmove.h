@@ -2,9 +2,9 @@
 #define STD_MOVE_H
 
 #include "chessmove.h"
+#include <memory>
 
 class Piece;
-class std::shared_ptr<Piece>;
 struct Location;
 
 class StandardMove: public ChessMove{

@@ -1,20 +1,20 @@
 #include "boardedit.h"
+#include <memory>
 using namespace std;
 
 BoardEdit::~BoardEdit() {}
 
 BoardEdit::BoardEdit(shared_ptr<Piece> piece): pieceAffected{piece}{}
-BoardEdit &operator=(BoardEdit &&other){
-	BoardEdit tmp{other};
-	swap(pieceAffected, tmp.pieceAffected);
+BoardEdit &BoardEdit::operator=(BoardEdit &&other) noexcept{;
+	swap(pieceAffected, other.pieceAffected);
 	return *this;
 }
-BoardEdit::BoardEdit(BoardEdit &&other): pieceAffected{other.pieceAffected}{}
-bool BoardEdit::operator==(BoardEdit &edit) const{
+BoardEdit::BoardEdit(BoardEdit &&other) noexcept: pieceAffected{other.pieceAffected}{}
+bool BoardEdit::operator==(const BoardEdit &edit) const{
 	return pieceAffected == edit.pieceAffected;
 }
 
-bool BoardEdit::operator!=(BoardEdit &edit) const{
+bool BoardEdit::operator!=(const BoardEdit &edit) const{
 	return pieceAffected != edit.pieceAffected;
 }
 

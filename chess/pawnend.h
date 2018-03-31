@@ -2,11 +2,10 @@
 #define PAWN_END_H
 
 #include "chessmove.h"
+#include <memory>
 
 class Piece;
 class Pawn;
-class std::shared_ptr<Piece>;
-class std::shared_ptr<Pawn>;
 struct Location;
 
 class PawnEnd: public ChessMove{
