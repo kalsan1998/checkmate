@@ -11,7 +11,7 @@ using namespace std;
 
 King::King(Colour colour): Piece{PieceType::KING, colour, INT_MAX, false, false}{}
 
-void King::checkCastlingMoves(const ChessBoard &board){
+void King::checkCastlingMoves(ChessBoard &board){
 	shared_ptr<King> sharedThis{this};
 	//castling is only availbale if king has not moved yet and is not in check
 	if(!(getMoveCount() > 1) && !(board.isCheck(getColour()))){
@@ -43,7 +43,7 @@ void King::checkCastlingMoves(const ChessBoard &board){
 	}
 }
 
-void King::checkStandardMoves(const ChessBoard &board){
+void King::checkStandardMoves(ChessBoard &board){
 	shared_ptr<King> sharedThis{this};
 	const vector<shared_ptr<Piece>> &moveableSqrs = getReachablePieces();
 	for(auto piece : moveableSqrs){
@@ -71,7 +71,7 @@ void King::notify(ChessBoard &board){
 	}
 }
 
-void King::updateLegalMoves(const ChessBoard &board){
+void King::updateLegalMoves(ChessBoard &board){
 	legalMoves.clear();
 	checkStandardMoves(board);
 	checkCastlingMoves(board);

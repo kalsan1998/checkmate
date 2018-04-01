@@ -1,13 +1,15 @@
 #include "gamecontroller.h"
 #include "classicchessboard.h"
-#include "piecefactory"
+#include "piecefactory.h"
 #include "location.h"
 #include "pieceadd.h"
 #include "pieceremove.h"
-#include "piecemove.h"
-#include "colours.h"
+#include "chessmove.h"
+#include "invalidmove.h"
+#include "colour.h"
+#include "player.h"
 #include "humanplayer.h"
-#include "computerplayer.h"
+//#include "computerplayer.h"
 
 using namespace std;
 
@@ -44,10 +46,10 @@ void GameController::setupMode(){
 				char pieceChar;
 				string locationStr;
 				//get the piece type and location, then execute
-				if((in >> pieceChar) && (in >> location)){
-					shared_ptr<Piece> piece = make_shared<Piece>{PieceFactory::generatePiece(pieceChar)};
+				if((in >> pieceChar) && (in >> locationStr)){
+					shared_ptr<Piece> piece = make_shared<Piece>(PieceFactory::generatePiece(pieceChar));
 					Location location = Location{locationStr};
-					board->executeEdit(PieceAdd{location, piece});
+					board->executeEdit(PieceAdd{piece, location});
 					board->notifyObservers();
 				}
 			//remove a piece
@@ -63,44 +65,51 @@ void GameController::setupMode(){
 			}else if(cmd == "="){
 				string colourStr;
 				if(in >> colourStr){
-					Colour colour = Colour::parse(colour);
-					setTurn(colour);
+					if(colourStr == "black") setTurn(Colour::WHITE);
+					if(colourStr == "white") setTurn(Colour::BLACK);
 				}
 			}
-		}catch(Exception &e){
-			out << e.what() << endl;
+		}catch(...){
+			out << "Invalid" << endl;
 		}
 	}
 }
 
 void GameController::runGame(){
 	Colour winner = Colour::NO_COLOUR;
-	string cmd;
-	while(in >> cmd){
-		Player currentPlayer = players[turn];
-		if(board->isCheckMate(currentPlayer.getColour())){
-			winner = players[nextTurn()].getColour();
+	string cmd = "move";
+	do{
+		unique_ptr<Player> &currentPlayer = players[turn];
+		if(board->isCheckmate(currentPlayer->getColour())){
+			winner = players[nextTurn()]->getColour();
 			out << "Checkmate! " << endl;
 			break;
-		}else if(board->isStaleMate(currentPlayer.getColour())){
+		}else if(board->isStalemate(currentPlayer->getColour())){
 			out << "Stalemate!" << endl;
 			break;
 		}
 		if(cmd == "move"){
 			try{
-				shared_ptr<PieceMove> move = currentPlayer->getMove();
-				board->executeChessMove(move);
+				currentPlayer->play(*board);
 				nextTurn();
-			}catch(Exception &e){
+			}catch(InvalidMove &e){
 				out << e.what() << endl;
+			}catch(InvalidLocation &e){
+				out << e.what() <<endl;
 			}
 		}else if(cmd == "resign"){
 			//the next player is displayed as the winner
 			winner = players[nextTurn()]->getColour();
 		}
-	}
+	}while(in >> cmd);
+
 	if(winner != Colour::NO_COLOUR){
-		out << (colour == Colour::BLACK ? "Black" : "White") + " wins!" << endl;
+		if(winner == Colour::WHITE){
+			out << "Black" << endl;
+		}else if(winner == Colour::BLACK){
+			out << "white" << endl;
+		}
+		out << " wins!" << endl;
 	}
 }
 
@@ -110,7 +119,7 @@ void GameController::startGame(){
 	while(in >> cmd){
 		if((cmd == "setup") and !gameRunning){
 			setupMode(); //runs until user inputs 'done'
-		}else if(cmd == move){
+		}else if(cmd == "move"){
 			gameRunning = true;
 			runGame(); //runs until resign or winner/draw
 			break;
@@ -121,13 +130,16 @@ void GameController::startGame(){
 void GameController::init(){
 	string cmd;
 	while(in >> cmd){
+		int addedPlayers;
+		int playerCount;
+		vector<Colour> colours;
 		reset();
 		bool readPlayers = true; //set false if invalid initialization command
 		if(cmd == "game"){
 			//standard game
 			playerCount = 2;
-			Colour colours[2] = {Colour::WHITE, Colour::BLACK};
-			board = unique_ptr<ChessBoard>{new ClassicChessBoard};
+			colours = {Colour::WHITE, Colour::BLACK};
+			board = make_unique<ClassicChessBoard>();
 			
 			/* ---------------------------------------------------------------------------------------
 			ADD DISPLAYS HERE
@@ -136,35 +148,35 @@ void GameController::init(){
 
 			-------------------------------------------------------------------------------*/
 		}else{
-			readPlayers = false
+			readPlayers = false;
 		}
 		if(readPlayers){
 			// add players until count is met
-			int addedPlayers = 0;
+			addedPlayers = 0;
 			string player;
 			while((in >> player) && addedPlayers < playerCount){
 				//check human player
 				if(player == "human"){
-					players.emplace_back(unique_ptr<Player>{new HumanPlayer{in, colours[addedPlayers]}}
+					players.emplace_back(make_unique<HumanPlayer>(colours[addedPlayers], in));
 					++addedPlayers;
 				//check computer player
-				}else if((player.len() == 10) && (player.substr(0, 8) == "computer")){
+				/*}else if((player.len() == 10) && (player.substr(0, 8) == "computer")){
 					string levelStr = player[9];
 					istringstream iss{levelstr};
 					int level;
 					if(iss >> level){
-						players.emplace_back(unique_ptr<Player>{new ComputerPlayer{board, level, colours[addedPlayers]}};
+						players.emplace_back(unique_ptr<Player>{new ComputerPlayer{colours[addedPlayers], board, level}};
 						++addedPlayers;
 					}else{
 						break;
 					}
-				}else{
+				*/}else{
 					//if invalid player input, then user has to type "game..." again
 					break;
 				}
 			}
 		}
-		if(addedPlayers = playerCount){
+		if(readPlayers && (addedPlayers == playerCount)){
 			startGame();
 			reset();
 		}

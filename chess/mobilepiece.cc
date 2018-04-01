@@ -12,7 +12,7 @@ using namespace std;
 MobilePiece::MobilePiece(PieceType type, Colour colour, int value, bool isDiag, bool isStraight, vector<Location> directions):
 	Piece(type, getColour(), value, isDiag, isStraight), directions{directions}{}
 	
-void MobilePiece::checkRegularMoves(const ChessBoard &board){
+void MobilePiece::checkRegularMoves(ChessBoard &board){
 	shared_ptr<MobilePiece> sharedThis{this};
 	//check all the squares in every direction
 	for(size_t i = 0; i < directions.size(); ++i){
@@ -40,7 +40,7 @@ void MobilePiece::checkRegularMoves(const ChessBoard &board){
 		}
 	}
 }
-void MobilePiece::updateLegalMoves(const ChessBoard &board){
+void MobilePiece::updateLegalMoves(ChessBoard &board){
 	clearReachablePieces();
 	legalMoves.clear();
 	checkRegularMoves(board);

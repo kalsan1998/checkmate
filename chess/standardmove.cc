@@ -7,7 +7,7 @@
 using namespace std;
 
 
-StandardMove::StandardMove(shared_ptr<Piece> piece, Location end): ChessMove{piece}{	
+StandardMove::StandardMove(shared_ptr<Piece> piece, Location end): ChessMove{piece, end}{	
 	vector<unique_ptr<const BoardEdit>> editSequence;
 	editSequence.emplace_back(make_unique<const PieceRemove>(piece));
 	editSequence.emplace_back(make_unique<const PieceAdd>(piece, end)); 

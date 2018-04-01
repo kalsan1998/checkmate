@@ -6,7 +6,7 @@
 class ChessBoard;
 
 class EmptyPiece: public Piece{
-	void updateLegalMoves(const ChessBoard &board) override;
+	void updateLegalMoves(ChessBoard &board) override;
 
 	public:
 	EmptyPiece();

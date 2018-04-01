@@ -6,12 +6,16 @@ using namespace std;
 
 ChessMove::~ChessMove(){}
 
-ChessMove::ChessMove(shared_ptr<Piece> pieceMoved): pieceMoved{pieceMoved}{}
+ChessMove::ChessMove(shared_ptr<Piece> pieceMoved, Location endLocation): 
+	pieceMoved{pieceMoved}, startLocation{pieceMoved->getLocation()}, endLocation{endLocation}{}
 ChessMove::ChessMove(ChessMove &&other) noexcept: editSequence{move(other.editSequence)}{}
 ChessMove &ChessMove::operator=(ChessMove &&other) noexcept{
 	swap(editSequence, other.editSequence);
 	return *this;
 }
+
+Location ChessMove::getStartLocation() const{ return startLocation; }
+Location ChessMove::getEndLocation() const{ return endLocation; }
 
 void ChessMove::executeReverse(ChessBoard &board) const{
 	for(auto it = editSequence.rbegin(); it != editSequence.rend(); ++it){

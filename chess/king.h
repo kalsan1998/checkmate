@@ -4,10 +4,10 @@
 #include "piece.h"
 
 class King: public Piece{
-	void checkCastlingMoves(const ChessBoard &board);	
-	void checkStandardMoves(const ChessBoard &board);
+	void checkCastlingMoves(ChessBoard &board);	
+	void checkStandardMoves(ChessBoard &board);
 
-	void updateLegalMoves(const ChessBoard &board) override;
+	void updateLegalMoves(ChessBoard &board) override;
 
 	public:
 	King(Colour colour);

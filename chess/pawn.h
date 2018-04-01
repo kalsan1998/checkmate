@@ -10,12 +10,10 @@ class Pawn: public Piece{
 	Location movementDirection;
 	Location sideDirection;
 
-	const std::vector<std::shared_ptr<Piece>> boardEndPieces; //possible pieces to end once reaching end of board
-
-	void checkCaptureMoves(const ChessBoard &board);
-	void checkEnPassantMoves(const ChessBoard &board);
-	void checkStandardMoves(const ChessBoard &board);
-	void updateLegalMoves(const ChessBoard &board) override;	
+	void checkCaptureMoves(ChessBoard &board);
+	void checkEnPassantMoves(ChessBoard &board);
+	void checkStandardMoves(ChessBoard &board);
+	void updateLegalMoves(ChessBoard &board) override;	
 	
 	public:
 	Pawn(Colour colour, Location direction);

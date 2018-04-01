@@ -11,9 +11,9 @@ class MobilePiece: public Piece{
 	//checkRegularMoves checks all moves going along the line that
 	//the piece is moveable until it goes out of bounds or runs into another
 	//piece. It adds the corresponding move/capture to legalMoves while doing so
-	void checkRegularMoves(const ChessBoard &board);
+	void checkRegularMoves(ChessBoard &board);
 
-	void updateLegalMoves(const ChessBoard &board) override;
+	void updateLegalMoves(ChessBoard &board) override;
 
 	public:
 	MobilePiece(PieceType type, Colour colour, int value, bool isDiag, bool isStraight, std::vector<Location> directions);

@@ -4,15 +4,14 @@
 #include "chessmove.h"
 #include <memory>
 
-class King;
-class Rook;
+class Piece;
 struct Location;
 
 class Castling: public ChessMove{
-	std::shared_ptr<Rook> rook;
+	std::shared_ptr<Piece> rook;
 
 	public:
-	Castling(std::shared_ptr<King> king, std::shared_ptr<Rook> rook, Location kingEnd, Location rookEnd);
+	Castling(std::shared_ptr<Piece> king, std::shared_ptr<Piece> rook, Location kingEnd, Location rookEnd);
 	Castling(Castling &&other) noexcept;
 	Castling &operator=(Castling &&other) noexcept;
 

@@ -82,7 +82,7 @@ const vector<shared_ptr<const ChessMove>> &Piece::getLegalMoves() const{
 	return legalMoves;
 }
 
-bool Piece::isBlockingCheck(const ChessBoard &board) const{
+bool Piece::isBlockingCheck(ChessBoard &board) const{
 	Location kingLocation = board.getKing(colour).getLocation();
 	//if theres no piece between this and its king, check if there is a queen/rook/bishop
 	//that is along the line 
@@ -118,6 +118,6 @@ bool Piece::isBlockingCheck(const ChessBoard &board) const{
 	return false;
 }
 
-bool Piece::isMoveOk(const ChessBoard &board, const Location &location) const{
+bool Piece::isMoveOk(ChessBoard &board, const Location &location) const{
 	return (!isBlockingCheck(board) || board.getKing(colour).getLocation().isInLine(location)) && board.isInBounds(location);
 }

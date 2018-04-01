@@ -7,8 +7,8 @@
 #include <vector>
 
 class Knight: public Piece{
-	void checkAllMoves(const ChessBoard &board);
-	void updateLegalMoves(const ChessBoard &board) override;	
+	void checkAllMoves(ChessBoard &board);
+	void updateLegalMoves(ChessBoard &board) override;	
 	
 	public:
 	Knight(Colour colour);

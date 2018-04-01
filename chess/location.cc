@@ -2,7 +2,7 @@
 #include <limits.h>
 using namespace std;
 
-string InvalidLocationException::what() const{
+string InvalidLocation::what() const{
 	return message; 
 }
 
@@ -11,7 +11,7 @@ Location::Location(string loc){
 		col = static_cast<int>(loc[0]);
 		row = loc[1];
 	}catch(...){
-		throw InvalidLocationException{};
+		throw InvalidLocation{};
 	}
 }
 

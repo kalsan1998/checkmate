@@ -8,7 +8,7 @@
 using namespace std;
 
 
-Capture::Capture(shared_ptr<Piece> piece, shared_ptr<Piece> captured): ChessMove{piece}, captured{captured}{
+Capture::Capture(shared_ptr<Piece> piece, shared_ptr<Piece> captured): ChessMove{piece, captured->getLocation()}, captured{captured}{
 	vector<unique_ptr<const BoardEdit>> editSequence;
 	editSequence.emplace_back(make_unique<const PieceRemove>(piece));
 	editSequence.emplace_back(make_unique<const PieceRemove>(captured));

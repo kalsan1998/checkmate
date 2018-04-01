@@ -4,9 +4,10 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+#include "player.h"
+#include "colour.h"
+#include "chessboard.h"
 
-class Player;
-class ChessBoard;
 
 class GameController{
 	std::istream &in;
@@ -19,7 +20,7 @@ class GameController{
 	//reset() clears players and sets turn and playerCount to 0
 	void reset();
 	int nextTurn(); //changes turn
-	void setTurn(Colour); //sets turn to colour or does nothing if colour DNE
+	void setTurn(Colour colour); //sets turn to colour or does nothing if colour DNE
 	
 	//setupMode() enters setup mode for the board and reads input for commands
 	void setupMode();

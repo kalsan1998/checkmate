@@ -4,14 +4,14 @@
 #include "chessmove.h"
 #include <memory>
 
-class Pawn;
+class Piece;
 class Location;
 
 class EnPassant: public ChessMove{
-	std::shared_ptr<Pawn> captured;
+	std::shared_ptr<Piece> captured;
 
 	public:
-	EnPassant(std::shared_ptr<Pawn> pawn1, std::shared_ptr<Pawn> pawn2, Location pawn1End);
+	EnPassant(std::shared_ptr<Piece> pawn1, std::shared_ptr<Piece> pawn2, Location pawn1End);
 	EnPassant(EnPassant &&other) noexcept;
 	EnPassant &operator=(EnPassant &&other) noexcept;
 

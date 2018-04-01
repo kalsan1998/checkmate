@@ -15,7 +15,7 @@ class Piece: public BoardObserver{
 	const PieceType type;
 	const Colour colour;
 	const int value;
-	Location location{0,0};
+	Location location{-1,-1};
 
 	int moveCount = 0;
 
@@ -27,7 +27,7 @@ class Piece: public BoardObserver{
 	
 	//this will update all the legal moves of the piece, it will also update
 	// the list of capturable pieces (and update those pieces' threats field)
-	virtual void updateLegalMoves(const ChessBoard &board) = 0;
+	virtual void updateLegalMoves(ChessBoard &board) = 0;
 
 	protected:
 	const std::vector<std::shared_ptr<Piece>> &getReachablePieces() const;
@@ -36,8 +36,8 @@ class Piece: public BoardObserver{
 
 	//returns true if there is a queen/bishop/rook that would
 	//check the king if this piece were removed
-	bool isBlockingCheck(const ChessBoard &board) const;
-	bool isMoveOk(const ChessBoard &board, const Location &location) const;
+	bool isBlockingCheck( ChessBoard &board) const;
+	bool isMoveOk(ChessBoard &board, const Location &location) const;
 	
 	public:
 	Colour getColour() const;

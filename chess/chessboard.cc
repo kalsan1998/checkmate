@@ -2,6 +2,7 @@
 #include "boardobserver.h"
 #include "piece.h"
 #include "king.h"
+#include "emptypiece.h"
 #include "location.h"
 #include "boardedit.h"
 #include "chessmove.h"
@@ -9,20 +10,8 @@
 using namespace std;
 
 ChessBoard::~ChessBoard(){}
-
-bool ChessBoard::isMoveLegal(const ChessMove &move) const{
-	for(auto &p : legalMoves){
-		const vector<shared_ptr<const ChessMove>> &legalMovesVec = p.second;
-		//iterate through legal moves until matching move is found
-		for(auto legalMove : legalMovesVec){
-			if(move == *legalMove) return true;
-		}
-	}
-	return false;
-}
-
-shared_ptr<const ChessMove> ChessBoard::getLastMove() const{
-	return executedMoves.top();
+const ChessMove &ChessBoard::getLastMove() const{
+	return *(executedMoves.top());
 }
 
 void ChessBoard::notifyObservers(){
@@ -50,15 +39,11 @@ void ChessBoard::detachObserver(shared_ptr<BoardObserver> obs){
 	}
 }
 
-const map<Location, shared_ptr<Piece>> &ChessBoard::getBoard() const{
-	return theBoard;
+const map<PieceType, vector<shared_ptr<Piece>>> &ChessBoard::getPieces(Colour colour){
+	return piecesMap[colour]; 
 }
 
-const map<PieceType, vector<shared_ptr<Piece>>> &ChessBoard::getPieces(Colour colour) const{
-	return piecesMap.find(colour)->second; 
-}
-
-King &ChessBoard::getKing(Colour colour) const{
+King &ChessBoard::getKing(Colour colour){
 	return *(static_pointer_cast<King>(((getPieces(colour).find(PieceType::KING))->second).front()));
 }
 	
@@ -67,35 +52,44 @@ bool ChessBoard::isInBounds(const Location &location) const{
 }
 
 shared_ptr<Piece> ChessBoard::getPieceAt(const Location &location) const{
-	return theBoard.find(location)->second;
+	auto it = theBoard.find(location);
+	if(it != theBoard.end()) return it->second;
+	return make_shared<EmptyPiece>();
 }
 
 vector<shared_ptr<const ChessMove>> &ChessBoard::getLegalMoves(Colour colour){
-	return legalMoves.find(colour)->second; 
+	return legalMoves[colour]; 
 }
 
 void ChessBoard::executeEdit(const BoardEdit &edit){
 	edit.execute(*this);	
 }
 
-void ChessBoard::executeChessMove(const shared_ptr<const ChessMove> move){
-	if(isMoveLegal(*move)){
-		//execute the move, then notify observers, then add this to the stack
-		move->execute(*this);
-		//clear all legal moves
-		for(auto &pair : legalMoves){
-			pair.second.clear();
-		}
-		//clear all threats of pieces
-		for(auto &pair : theBoard){
-			pair.second->clearThreats();
-			pair.second->clearReachablePieces();
-		}
-		notifyObservers();
-		executedMoves.push(move);
-	}else{
-		throw InvalidMove{};
+void ChessBoard::executeMove(Colour colour, const Location start, const Location end){
+	vector<shared_ptr<const ChessMove>> &legals = getLegalMoves(colour);
+	for(auto move : legals){
+			if((start == move->getStartLocation()) && (end == move->getEndLocation())){
+				executeChessMove(move);
+				return;
+			}
 	}
+	throw InvalidMove{};
+}
+
+void ChessBoard::executeChessMove(const shared_ptr<const ChessMove> move){
+	//execute the move, then notify observers, then add this to the stack
+	move->execute(*this);
+	//clear all legal moves
+	for(auto &pair : legalMoves){
+		pair.second.clear();
+	}
+	//clear all threats of pieces
+	for(auto &pair : theBoard){
+		pair.second->clearThreats();
+		pair.second->clearReachablePieces();
+	}
+	notifyObservers();
+	executedMoves.push(move);
 }
 
 void ChessBoard::undo(){
@@ -114,16 +108,16 @@ bool ChessBoard::isLocationSafe(const Location &location, Colour colour) const{
 	return false;
 }
 
-bool ChessBoard::isCheck(Colour turn) const{
+bool ChessBoard::isCheck(Colour turn){
 	King &king = getKing(turn);
 	return isLocationSafe(king.getLocation(), turn);
 }
 
-bool ChessBoard::isStalemate(Colour turn) const{
+bool ChessBoard::isStalemate(Colour turn){
 	return (legalMoves.find(turn)->second).size() == 0;
 }
 
-bool ChessBoard::isCheckmate(Colour turn) const{
+bool ChessBoard::isCheckmate(Colour turn){
 	return isCheck(turn) && isStalemate(turn);
 }
 

@@ -3,8 +3,9 @@
 
 #include <stdexcept>
 
-class InvalidLocationException{
+class InvalidLocation{
 	std::string message = "Invalid location format";
+	public:
 	std::string what() const;
 };
 

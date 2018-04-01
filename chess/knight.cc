@@ -12,7 +12,7 @@ using namespace std;
 Knight::Knight(Colour colour): 
 	Piece{PieceType::KNIGHT, colour, 3, false, false}{}
 
-void Knight::checkAllMoves(const ChessBoard &board){
+void Knight::checkAllMoves(ChessBoard &board){
 	shared_ptr<Knight> sharedThis{this};
 	Location moves[8] = {{1,2},{2,1},{-1,2},{2,-1},{1,-2},{-2,1},{-1,-2},{-2,-1}};
 	
@@ -39,7 +39,7 @@ void Knight::checkAllMoves(const ChessBoard &board){
 }
 		
 
-void Knight::updateLegalMoves(const ChessBoard &board){
+void Knight::updateLegalMoves(ChessBoard &board){
 	clearReachablePieces();
 	legalMoves.clear();
 	checkAllMoves(board);

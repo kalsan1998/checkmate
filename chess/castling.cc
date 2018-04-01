@@ -1,6 +1,5 @@
 #include "castling.h"
-#include "king.h"
-#include "rook.h"
+#include "piece.h"
 #include "location.h"
 #include "pieceadd.h"
 #include "pieceremove.h"
@@ -8,7 +7,7 @@
 using namespace std;
 
 
-Castling::Castling(shared_ptr<King> king, shared_ptr<Rook> rook, Location kingEnd, Location rookEnd): ChessMove{king}, rook{rook}{	
+Castling::Castling(shared_ptr<Piece> king, shared_ptr<Piece> rook, Location kingEnd, Location rookEnd): ChessMove{king, kingEnd}, rook{rook}{	
 	vector<unique_ptr<const BoardEdit>> editSequence;
 	editSequence.emplace_back(make_unique<const PieceRemove>(king));
 	editSequence.emplace_back(make_unique<const PieceRemove>(rook));
