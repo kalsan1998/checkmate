@@ -22,7 +22,7 @@ class Piece: public BoardObserver{
 	const bool isDiagonal; //piece can move diagonally unlimited (ie bishop or queen)
 	const bool isStraight; //piece can move straight unlimited (ie rook or queen)
 
-	std::vector<std::shared_ptr<Piece>> moveableSquares;
+	std::vector<std::shared_ptr<Piece>> reachablePieces;
 	std::vector<std::shared_ptr<Piece>> threats;
 	
 	//this will update all the legal moves of the piece, it will also update
@@ -30,11 +30,7 @@ class Piece: public BoardObserver{
 	virtual void updateLegalMoves(const ChessBoard &board) = 0;
 
 	protected:
-	std::vector<std::shared_ptr<Piece>> &getMoveableSquares() const;
-	void clearMoveableSquares()
-	void addMoveableSquare(std::shared_ptr<Piece>> square); //means this piece can move to the sqaures location, also updates squares 'threats' field
-	void clearThreats();
-	void addThreat(std::shared_ptr<Piece> threat); //means threat can move to this piece's location
+	const std::vector<std::shared_ptr<Piece>> &getReachablePieces() const;
 	std::vector<std::shared_ptr<const ChessMove>> legalMoves;
 	Piece(PieceType type, Colour colour, int value, bool isDiag, bool isStraigt);
 
@@ -47,12 +43,17 @@ class Piece: public BoardObserver{
 	Colour getColour() const;
 	PieceType getType() const;
 	int getValue() const;
-	int &getMoveCount() const;
+	int &getMoveCount();
 	Location getLocation() const;
 	virtual void setLocation(const Location &location);
 
 	const std::vector<std::shared_ptr<Piece>> &getThreats() const;
 	const std::vector<std::shared_ptr<const ChessMove>> &getLegalMoves() const;
+	void addReachablePiece(std::shared_ptr<Piece> square); //means this piece can move to the squares location, also updates squares 'threats' field
+	void addThreat(std::shared_ptr<Piece> threat); //means threat can move to this piece's location
+
+	void clearThreats();
+	void clearReachablePieces();
 
 	bool isEmpty() const;
 	bool isDiagonalMover() const;

@@ -10,7 +10,7 @@ class Pawn: public Piece{
 	Location movementDirection;
 	Location sideDirection;
 
-	std::vector<std::shared_ptr<Piece>> boardEndPieces; //possible pieces to end once reaching end of board
+	const std::vector<std::shared_ptr<Piece>> boardEndPieces; //possible pieces to end once reaching end of board
 
 	void checkCaptureMoves(const ChessBoard &board);
 	void checkEnPassantMoves(const ChessBoard &board);

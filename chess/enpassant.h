@@ -15,8 +15,8 @@ class EnPassant: public ChessMove{
 	EnPassant(EnPassant &&other) noexcept;
 	EnPassant &operator=(EnPassant &&other) noexcept;
 
-	void execute(Chessboard &board) const override;
-	void executeReverse(Chessboard &board) const override;
+	void execute(ChessBoard &board) const override;
+	void executeReverse(ChessBoard &board) const override;
 
 };
 

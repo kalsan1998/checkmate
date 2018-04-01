@@ -19,7 +19,7 @@ class Castling: public ChessMove{
 	void execute(ChessBoard &board) const override;
 	void executeReverse(ChessBoard &board) const override;
 
-}
+};
 
 
 #endif 

@@ -10,6 +10,9 @@
 #include "rook.h"
 #include "knight.h"
 #include "bishop.h"
+#include "piecetype.h"
+#include "location.h"
+#include "colour.h"
 #include <memory>
 #include <vector>
 using namespace std;
@@ -35,15 +38,15 @@ void Pawn::checkStandardMoves(const ChessBoard &board){
 			legalMoves.emplace_back(make_shared<StandardMove>(sharedThis, oneForward));
 			
 			//double forward for first move
-			if(!(moveCount > 1)){
+			if(!(getMoveCount() > 1)){
 				if(board.getPieceAt(twoForward)->isEmpty()){
 					legalMoves.emplace_back(make_shared<PawnDouble>(sharedThis, oneForward));
 				}
 			}
 			//pawn reaching end
 			if(!board.isInBounds(twoForward)){
-				for(auto it : boardEndPieces){
-					legalMoves.emplace_back(make_shared<PawnEndCapture>(sharedThis, *it, oneForward));
+				for(auto piece : boardEndPieces){
+					legalMoves.emplace_back(make_shared<PawnEnd>(sharedThis, piece, oneForward));
 				}
 			}
 		}
@@ -64,14 +67,14 @@ void Pawn::checkCaptureMoves(const ChessBoard &board){
 		Location diag = diags[i];
 		if(board.isInBounds(diag)){	
 			shared_ptr<Piece> piece = board.getPieceAt(diag);
-			addMoveableSquare(piece);
+			addReachablePiece(piece);
 			if(isMoveOk(board, diag)){
 				//piece is capturable
 				if((piece->getColour() != getColour()) && (!piece->isEmpty())){	
 					//capture piece and make it to end
 					if(!board.isInBounds(twoForward)){	
-						for(auto it : boardEndPieces){
-							legalMoves.emplace_back(make_shared<PawnEndCapture>(sharedThis, piece, *it));
+						for(auto piece : boardEndPieces){
+							legalMoves.emplace_back(make_shared<PawnEndCapture>(sharedThis, piece, piece));
 						}
 					//just capture
 					}else{
@@ -107,7 +110,7 @@ void Pawn::checkEnPassantMoves(const ChessBoard &board){
 }
 
 void Pawn::updateLegalMoves(const ChessBoard &board){
-	clearMoveableSquares();
+	clearReachablePieces();
 	legalMoves.clear();
 	checkStandardMoves(board);
 	checkCaptureMoves(board);

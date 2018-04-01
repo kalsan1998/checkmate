@@ -3,7 +3,11 @@
 
 #include "piece.h"
 
+class ChessBoard;
+
 class EmptyPiece: public Piece{
+	void updateLegalMoves(const ChessBoard &board) override;
+
 	public:
 	EmptyPiece();
 };

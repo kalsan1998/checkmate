@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <memory>
-#include <stdlib>
+#include <vector>
 
 class Player;
 class ChessBoard;

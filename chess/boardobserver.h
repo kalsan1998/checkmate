@@ -4,6 +4,7 @@
 class ChessBoard;
 
 class BoardObserver{
+	public:
 	virtual void notify(ChessBoard &board) = 0;
 };
 	

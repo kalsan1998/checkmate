@@ -1,17 +1,11 @@
 #ifndef ROOK_H
 #define ROOK_H
 
-#include "piece.h"
-#include "location.h"
-#include <memory>
-#include <vector>
+#include "mobilepiece.h"
 
-class Rook: public Piece{
-	void chechAllMoves(const ChessBoard &board);
-	void updateLegalMoves(const ChessBoard &board) override;
-
+class Rook: public MobilePiece{
 	public:
 	Rook(Colour colour);
-}
+};
 
 #endif

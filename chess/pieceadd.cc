@@ -6,7 +6,7 @@
 #include <memory>
 using namespace std;
 
-PieceAdd::PieceAdd(const Location &location, shared_ptr<Piece> piece): BoardEdit{piece}, location{location}{}
+PieceAdd::PieceAdd(shared_ptr<Piece> piece, const Location &location): BoardEdit{piece}, location{location}{}
 
 void PieceAdd::execute(ChessBoard &board) const{
 	if(board.isInBounds(location)){

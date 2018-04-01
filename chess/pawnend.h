@@ -17,8 +17,8 @@ class PawnEnd: public ChessMove{
 	PawnEnd(PawnEnd &&other) noexcept;
 	PawnEnd &operator=(PawnEnd &&other) noexcept;
 
-	void execute(Board &board) const;
-	void executeReverse(Board &board) const;
+	void execute(ChessBoard &board) const;
+	void executeReverse(ChessBoard &board) const;
 };
 
 

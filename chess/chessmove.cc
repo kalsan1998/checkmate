@@ -1,10 +1,17 @@
 #include "chessmove.h"
 #include "boardedit.h"
+#include "chessboard.h"
+#include "piece.h"
 using namespace std;
 
 ChessMove::~ChessMove(){}
 
 ChessMove::ChessMove(shared_ptr<Piece> pieceMoved): pieceMoved{pieceMoved}{}
+ChessMove::ChessMove(ChessMove &&other) noexcept: editSequence{move(other.editSequence)}{}
+ChessMove &ChessMove::operator=(ChessMove &&other) noexcept{
+	swap(editSequence, other.editSequence);
+	return *this;
+}
 
 void ChessMove::executeReverse(ChessBoard &board) const{
 	for(auto it = editSequence.rbegin(); it != editSequence.rend(); ++it){

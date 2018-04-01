@@ -15,8 +15,8 @@ StandardMove::StandardMove(shared_ptr<Piece> piece, Location end): ChessMove{pie
 	setEditSequence(move(editSequence));
 }
 
-StandardMove::StandardMove(StandardMove &&other): ChessMove(move(other)){}
-StandardMove &StandardMove::operator=(StandardMove &&other){
+StandardMove::StandardMove(StandardMove &&other) noexcept: ChessMove(move(other)){}
+StandardMove &StandardMove::operator=(StandardMove &&other) noexcept{
 	ChessMove::operator=(move(other));
 	return *this;
 }

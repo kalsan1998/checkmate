@@ -19,7 +19,7 @@ int Piece::getValue() const{
 	return value;
 }
 
-int &getMoveCount() const{
+int &Piece::getMoveCount(){
 	return moveCount;
 }
 
@@ -32,17 +32,17 @@ void Piece::setLocation(const Location &otherLocation){
 	++moveCount;
 }
 
-vector<shared_ptr<Piece>> &Piece::getMoveableSquares() const{
-	return moveableSquares;
+const vector<shared_ptr<Piece>> &Piece::getReachablePieces() const{
+	return reachablePieces;
 }
 
-void Piece::clearMoveableSquares{
-	moveableSquares.clear();
+void Piece::clearReachablePieces(){
+	reachablePieces.clear();
 }
 
-void Piece::addMoveableSquare(shared_ptr<Piece> square){
-	moveableSquares.emplace_back(square);
-	square->addThreat(make_shared<Piece>(this));
+void Piece::addReachablePiece(shared_ptr<Piece> square){
+	reachablePieces.emplace_back(square);
+	square->addThreat(shared_ptr<Piece>{this});
 }
 
 void Piece::clearThreats(){
@@ -53,7 +53,7 @@ void Piece::addThreat(shared_ptr<Piece> threat){
 	threats.emplace_back(threat);
 }
 
-const vector<shared_ptr<Piece>> &getThreats() const{
+const vector<shared_ptr<Piece>> &Piece::getThreats() const{
 	return threats;
 }
 
@@ -75,7 +75,7 @@ void Piece::notify(ChessBoard &board){
 	updateLegalMoves(board);
 	//add this pieces legal moves to the board's legal moves
 	vector<shared_ptr<const ChessMove>> &boardLegalMoves = board.getLegalMoves(colour);
-	legalMoves.insert(legalMoves.end(), legalMoves.begin(), legalMoves.end()); 
+	legalMoves.insert(boardLegalMoves.end(), legalMoves.begin(), legalMoves.end()); 
 }
 
 const vector<shared_ptr<const ChessMove>> &Piece::getLegalMoves() const{
@@ -93,8 +93,6 @@ bool Piece::isBlockingCheck(const ChessBoard &board) const{
 		//iterate along line to see if theres anypiece between this and the king
 		//if a piece is found between them then this piece can move without worrying about 
 		//opening a check
-		int horz = kingLocation.col + horzDir;
-		int vert = kingLocation.row + vertDir;
 		Location currLocation = kingLocation + lineDirection;
 		while(currLocation != location){
 			if(board.getPieceAt(currLocation)->isEmpty()) return false;

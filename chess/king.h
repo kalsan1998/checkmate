@@ -7,6 +7,8 @@ class King: public Piece{
 	void checkCastlingMoves(const ChessBoard &board);	
 	void checkStandardMoves(const ChessBoard &board);
 
+	void updateLegalMoves(const ChessBoard &board) override;
+
 	public:
 	King(Colour colour);
 	void notify(ChessBoard &board) override;
