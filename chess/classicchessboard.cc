@@ -52,9 +52,11 @@ ClassicChessBoard::ClassicChessBoard(){
 		attachObserver(whitePiece);
 		attachObserver(blackPiece);
 	}
-	//notify all the pieces to get the legal moves
-	cout << "NOTIFYING" << endl;
-	notifyObservers();
 	cout << "BOARD CREATED" << endl;
+}
+
+
+const vector<vector<int>> ClassicChessBoard::getBounds() const{
+	return {{'a', 'h'}, {1, 8}};
 }
 

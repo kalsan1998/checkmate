@@ -3,6 +3,7 @@
 
 #include "piece.h"
 #include <vector>
+#include <string>
 #include "location.h"
 
 class MobilePiece: public Piece{
@@ -16,7 +17,7 @@ class MobilePiece: public Piece{
 	void updateLegalMoves(ChessBoard &board) override;
 
 	public:
-	MobilePiece(PieceType type, Colour colour, int value, bool isDiag, bool isStraight, std::vector<Location> directions);
+	MobilePiece(PieceType type, Colour colour, std::string displaySymbol, int value, bool isDiag, bool isStraight, std::vector<Location> directions);
 };
 
 #endif

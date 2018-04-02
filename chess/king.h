@@ -3,6 +3,7 @@
 
 #include "piece.h"
 #include <vector>
+#include <string>
 
 class King: public Piece{
 	void checkCastlingMoves(ChessBoard &board);	
@@ -13,7 +14,7 @@ class King: public Piece{
 	std::vector<Location> moveableLocation;
 	
 	public:
-	King(Colour colour);
+	King(Colour colour, std::string displaySymbol);
 	void notify(ChessBoard &board) override;
 	
 	//this is a special notify because the king's possible

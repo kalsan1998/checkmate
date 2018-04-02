@@ -32,6 +32,8 @@ class ChessBoard{
 
 	public:
 	std::map<Location, std::shared_ptr<Piece>> &getBoard();
+	virtual const std::vector<std::vector<int>> getBounds() const = 0; //returns bounds as {col_min, col_max}}{row_min, row_max}}
+	bool isInBounds(const Location location) const; //returns true if location is valid on the board
 	const std::map<PieceType, std::vector<std::shared_ptr<Piece>>> &getPieces(Colour colour); //gets the pieces for a colour
 	std::shared_ptr<King> getKing(Colour colour);
 	
@@ -39,7 +41,6 @@ class ChessBoard{
 	void detachObserver(std::shared_ptr<BoardObserver> obs);
 	void notifyObservers();
 	
-	bool isInBounds(const Location location) const; //returns true if location is valid on the board
 	std::shared_ptr<Piece> getPieceAt(const Location location) const; //get the Piece at a location on the board
 	std::vector<std::shared_ptr<const ChessMove>> &getLegalMoves(Colour colour); //returns all legal moves for a player
 	const std::shared_ptr<const ChessMove> getLastMove() const;

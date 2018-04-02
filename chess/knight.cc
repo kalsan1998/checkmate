@@ -7,10 +7,11 @@
 #include "standardmove.h"
 #include <memory>
 #include <vector>
+#include <string>
 using namespace std;
 
-Knight::Knight(Colour colour): 
-	Piece{PieceType::KNIGHT, colour, 3, false, false}{}
+Knight::Knight(Colour colour, string displaySymbol): 
+	Piece{PieceType::KNIGHT, colour, displaySymbol, 3, false, false}{}
 
 void Knight::checkAllMoves(ChessBoard &board){
 	Location moves[8] = {{1,2},{2,1},{-1,2},{2,-1},{1,-2},{-2,1},{-1,-2},{-2,-1}};

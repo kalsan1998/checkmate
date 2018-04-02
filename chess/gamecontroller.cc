@@ -11,7 +11,7 @@
 #include "player.h"
 #include "humanplayer.h"
 //#include "computerplayer.h"
-
+#include "textdisplay.h"
 using namespace std;
 
 GameController::GameController(istream &in, ostream &out): in{in}, out{out} {}
@@ -117,6 +117,7 @@ void GameController::runGame(){
 }
 
 void GameController::startGame(){
+	board->notifyObservers();
 	bool gameRunning = false;
 	string cmd;
 	while(in >> cmd){
@@ -143,12 +144,10 @@ void GameController::init(){
 			playerCount = 2;
 			colours = {Colour::WHITE, Colour::BLACK};
 			board = make_unique<ClassicChessBoard>();
-			/* ---------------------------------------------------------------------------------------
-			ADD DISPLAYS HERE
-			unique_ptr<GraphicDisplay>
-			board->attachObserver()
-
-			-------------------------------------------------------------------------------*/
+		
+			//ADD DISPLAYS
+			shared_ptr<TextDisplay> textDisplay = make_shared<TextDisplay>(*board, out);
+			board->attachObserver(textDisplay);
 		}else{
 			readPlayers = false;
 		}
@@ -156,7 +155,7 @@ void GameController::init(){
 			// add players until count is met
 			addedPlayers = 0;
 			string player;
-			while((in >> player) && (addedPlayers < playerCount)){
+			while((addedPlayers < playerCount) && (in >> player)){
 				//check human player
 				if(player == "human"){
 					players.emplace_back(make_unique<HumanPlayer>(colours[addedPlayers], in));
@@ -174,6 +173,7 @@ void GameController::init(){
 					}
 				*/}else{
 					//if invalid player input, then user has to type "game..." again
+					out << "Invalid player type" << endl;
 					break;
 				}
 			}

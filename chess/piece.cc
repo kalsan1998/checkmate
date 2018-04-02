@@ -5,12 +5,10 @@
 #include "king.h"
 using namespace std;
 
-Piece::~Piece(){
-	cout << "CALLING DESTRUCTOR ON: " << location.col << "/" << location.row << endl;
-}
+Piece::~Piece(){}
 
-Piece::Piece(PieceType type, Colour colour, int value, bool isDiag, bool isStraigt): 
-	type{type}, colour{colour}, value{value}, isDiagonal{isDiag}, isStraight{isStraight} {}
+Piece::Piece(PieceType type, Colour colour, string displaySymbol, int value, bool isDiag, bool isStraigt): 
+	type{type}, colour{colour}, displaySymbol{displaySymbol}, value{value}, isDiagonal{isDiag}, isStraight{isStraight} {}
 
 Colour Piece::getColour() const{
 	return colour;
@@ -18,6 +16,10 @@ Colour Piece::getColour() const{
 
 PieceType Piece::getType() const{
 	return type;
+}
+
+string Piece::getDisplaySymbol() const{
+	return displaySymbol;
 }
 
 int Piece::getValue() const{
@@ -98,12 +100,13 @@ bool Piece::operator==(const Piece &other) const{
 
 void Piece::notify(ChessBoard &board){
 	clearThreats();
-	cout << "NOTIFYING COL/ROW: " << location.col << "/" << location.row << endl;
 	updateLegalMoves(board);
-	cout << "LEGAL MOVES: " << legalMoves.size() << endl;
+	cout << "Location Legal Moves Count: " << location.col << "/" << location.row << " "<< legalMoves.size() << endl;
 	//add this pieces legal moves to the board's legal moves
 	vector<shared_ptr<const ChessMove>> boardLegalMoves = board.getLegalMoves(colour);
-	boardLegalMoves.insert(boardLegalMoves.end(), legalMoves.begin(), legalMoves.end());
+	for(move : legalMoves){
+		boardLegalMoves.emplace_back(move);
+	}
 
 }
 

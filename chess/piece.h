@@ -9,12 +9,14 @@
 #include "chessmove.h"
 #include "location.h"
 #include <memory>
+#include <string>
 
 class ChessBoard;
 
 class Piece: public BoardObserver{
 	const PieceType type;
 	const Colour colour;
+	const std::string displaySymbol;
 	const int value;
 	Location location{-1,-1};
 
@@ -36,7 +38,7 @@ class Piece: public BoardObserver{
 	protected:
 	//const std::vector<std::shared_ptr<Piece>> &getReachablePieces() const;
 	std::vector<std::shared_ptr<const ChessMove>> legalMoves;
-	Piece(PieceType type, Colour colour, int value, bool isDiag, bool isStraigt);
+	Piece(PieceType type, Colour colour, std::string displaySymbol, int value, bool isDiag, bool isStraigt);
 
 	//returns true if there is a queen/bishop/rook that would
 	//check the king if this piece were removed
@@ -48,6 +50,7 @@ class Piece: public BoardObserver{
 
 	Colour getColour() const;
 	PieceType getType() const;
+	std::string getDisplaySymbol() const;
 	int getValue() const;
 	int &getMoveCount();
 	Location getLocation() const;

@@ -4,6 +4,7 @@
 #include "piece.h"
 #include "location.h"
 #include <vector>
+#include <string>
 
 class Pawn: public Piece{
 	Location movementDirection;
@@ -15,7 +16,7 @@ class Pawn: public Piece{
 	void updateLegalMoves(ChessBoard &board) override;	
 	
 	public:
-	Pawn(Colour colour, Location direction);
+	Pawn(Colour colour, std::string displaySymbol, Location direction);
 };
 
 

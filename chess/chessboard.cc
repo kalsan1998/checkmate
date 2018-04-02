@@ -14,8 +14,7 @@
 using namespace std;
 
 ChessBoard::~ChessBoard(){
-	cout << "clearing board" << endl;
-	cout << legalMoves.size() << endl;
+	cout << "BOARD DESTROYED" << endl;
 	legalMoves.clear();
 
 	for(auto &pair : theBoard){
@@ -81,6 +80,7 @@ shared_ptr<Piece> ChessBoard::getPieceAt(const Location location) const{
 }
 
 vector<shared_ptr<const ChessMove>> &ChessBoard::getLegalMoves(Colour colour){
+	cout << "LEGAL MOVES: " << legalMoves[colour].size() << endl;
 	return legalMoves[colour]; 
 }
 

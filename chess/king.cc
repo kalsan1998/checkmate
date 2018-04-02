@@ -7,9 +7,10 @@
 #include <memory>
 #include <vector>
 #include <limits.h>
+#include <string>
 using namespace std;
 
-King::King(Colour colour): Piece{PieceType::KING, colour, INT_MAX, false, false}{}
+King::King(Colour colour, string displaySymbol): Piece{PieceType::KING, colour, displaySymbol, INT_MAX, false, false}{}
 
 void King::checkCastlingMoves(ChessBoard &board){
 	shared_ptr<Piece> sharedThis = board.getPieceAt(getLocation());

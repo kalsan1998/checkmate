@@ -14,7 +14,6 @@ void PieceAdd::execute(ChessBoard &board) const{
 		if(!oldPiece->isEmpty()) PieceRemove{oldPiece}.execute(board);
 
 		//add new piece
-		pieceAffected->clearThreats();
 		board.theBoard[location] = pieceAffected;
 		vector<shared_ptr<Piece>> &piecesVec = board.piecesMap[pieceAffected->getColour()][pieceAffected->getType()];
 		piecesVec.emplace_back(pieceAffected);

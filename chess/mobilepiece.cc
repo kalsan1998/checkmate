@@ -7,10 +7,11 @@
 #include "standardmove.h"
 #include <vector>
 #include <memory>
+#include <string>
 using namespace std;
 
-MobilePiece::MobilePiece(PieceType type, Colour colour, int value, bool isDiag, bool isStraight, vector<Location> directions):
-	Piece(type, colour, value, isDiag, isStraight), directions{directions}{}
+MobilePiece::MobilePiece(PieceType type, Colour colour, string displaySymbol, int value, bool isDiag, bool isStraight, vector<Location> directions):
+	Piece(type, colour, displaySymbol, value, isDiag, isStraight), directions{directions}{}
 	
 void MobilePiece::checkRegularMoves(ChessBoard &board){	
 	shared_ptr<Piece> sharedThis = board.getPieceAt(getLocation());
