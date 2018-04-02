@@ -23,7 +23,10 @@ void GameController::reset(){
 }
 
 int GameController::nextTurn(){
-	turn = (++turn) % playerCount;
+	if(playerCount != 0){
+		++turn;
+		turn = turn%playerCount;
+	}
 	return turn;
 }
 
@@ -41,7 +44,32 @@ void GameController::setupMode(){
 	while(in >> cmd){
 		try{
 			if(cmd == "done"){
-				break;
+				bool validBoardSetup = true;
+				//check king count + check
+				for(auto &player : players){
+					Colour colour = player->getColour();
+					vector<shared_ptr<Piece>> kings = (board->getPieces(colour).find(PieceType::KING))->second;
+					if(kings.size() != 1){
+						out << "Invalid King count" << endl;
+						validBoardSetup = false;
+						break;
+					}else if(board->isCheck(colour)){
+						out << "King is in check" << endl;
+						validBoardSetup = false;
+						break;
+					}else{
+						vector<shared_ptr<Piece>> pawns	= board->getPieces(colour).find(PieceType::PAWN)->second;
+						for(auto pawn : pawns){
+							Location pawnLoc = pawn->getLocation();
+							if(!(board->isInBounds(pawnLoc + Location{0,1}) && board->isInBounds(pawnLoc - Location{0,1}))){
+								out << "Pawns can't be at end" << endl;
+								validBoardSetup = false;
+								break;	
+							}
+						}
+					}
+				}
+				if(validBoardSetup) break;
 			//add a piece
 			}else if(cmd == "+"){
 				char pieceChar;
@@ -49,10 +77,11 @@ void GameController::setupMode(){
 				//get the piece type and location, then execute
 				if((in >> pieceChar) && (in >> locationStr)){
 					shared_ptr<Piece> piece = PieceFactory::generatePiece(pieceChar);
-					Location location = Location{locationStr};
-					board->executeEdit(PieceAdd{piece, location});
-					board->attachObserver(piece);
-					board->notifyObservers();
+					if(!piece->isEmpty()){
+						Location location = Location{locationStr};
+						board->executeEdit(PieceAdd{piece, location});
+						board->notifyObservers();
+					}
 				}
 			//remove a piece
 			}else if(cmd == "-"){
@@ -62,14 +91,13 @@ void GameController::setupMode(){
 					Location location{locationStr};
 					shared_ptr<Piece> piece = board->getPieceAt(location);
 					board->executeEdit(PieceRemove{piece});
-					board->detachObserver(piece);
 					board->notifyObservers();
 				}
 			}else if(cmd == "="){
 				string colourStr;
 				if(in >> colourStr){
-					if(colourStr == "black") setTurn(Colour::WHITE);
-					if(colourStr == "white") setTurn(Colour::BLACK);
+					if(colourStr == "black") setTurn(Colour::BLACK);
+					if(colourStr == "white") setTurn(Colour::WHITE);
 				}
 			}
 		}catch(...){
@@ -83,14 +111,6 @@ void GameController::runGame(){
 	string cmd = "move";
 	do{
 		unique_ptr<Player> &currentPlayer = players[turn];
-		if(board->isCheckmate(currentPlayer->getColour())){
-			winner = players[nextTurn()]->getColour();
-			out << "Checkmate! " << endl;
-			break;
-		}else if(board->isStalemate(currentPlayer->getColour())){
-			out << "Stalemate!" << endl;
-			break;
-		}
 		if(cmd == "move"){
 			try{
 				currentPlayer->play(*board);
@@ -103,14 +123,26 @@ void GameController::runGame(){
 		}else if(cmd == "resign"){
 			//the next player is displayed as the winner
 			winner = players[nextTurn()]->getColour();
+			break;
+		}
+		Colour nextPlayerColour = players[turn]->getColour();
+		if(board->isCheckmate(nextPlayerColour)){
+			winner = currentPlayer->getColour();
+			out << "Checkmate! " << endl;
+			break;
+		}else if(board->isStalemate(nextPlayerColour)){
+			out << "Stalemate!" << endl;
+			break;
+		}else if(board->isCheck(nextPlayerColour)){
+			out << "Check!" << endl;
 		}
 	}while(in >> cmd);
 
 	if(winner != Colour::NO_COLOUR){
 		if(winner == Colour::WHITE){
-			out << "Black" << endl;
+			out << "Black";
 		}else if(winner == Colour::BLACK){
-			out << "white" << endl;
+			out << "White";
 		}
 		out << " wins!" << endl;
 	}
@@ -135,7 +167,7 @@ void GameController::init(){
 	string cmd;
 	while(in >> cmd){
 		int addedPlayers;
-		int playerCount;
+		playerCount = 0;
 		vector<Colour> colours;
 		reset();
 		bool readPlayers = true; //set false if invalid initialization command

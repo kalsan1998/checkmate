@@ -1,8 +1,8 @@
-#include <iostream>
 #include "piece.h"
 #include "chessboard.h"
 #include "location.h"
 #include "king.h"
+#include <vector>
 using namespace std;
 
 Piece::~Piece(){}
@@ -38,42 +38,21 @@ void Piece::setLocation(const Location otherLocation){
 	location = otherLocation;
 }
 
-/*void Piece::removeReachablePiece(shared_ptr<Piece> rmPiece){
-	for(auto it = reachablePieces.begin(); it != reachablePieces.end(); ++it){
-		if(*it == rmPiece){
-			*(*it) = make_shared<EmptyPiece>();
-			break;
-		}
-	}
-}
-
-void Piece::removeThreat(shared_ptr<Piece> threat){
-	for(auto it = threats.begin(); it != threats.end(); ++it){
-		if(*it == threat){
-			threats.erase(it);
-			break;
-		}
-	}
-}
-
-const vector<shared_ptr<Piece>> &Piece::getReachablePieces() const{
-	return reachablePieces;
-}
-
-void Piece::clearReachablePieces(){
-	reachablePieces.clear();
-}
-
-void Piece::addReachablePiece(shared_ptr<Piece> square){
-	reachablePieces.emplace_back(square);
-	square->addThreat(shared_ptr<Piece>{this});
-}
-*/
 void Piece::clearLegalMoves(){
 	legalMoves.clear();
 }
 void Piece::clearThreats(){
 	threats.clear();
+}
+
+vector<shared_ptr<Piece>> Piece::getOpponentThreats() const{
+	vector<shared_ptr<Piece>> opponentThreats;
+	for(auto piece : threats){
+		if(piece->colour != colour){
+			opponentThreats.emplace_back(piece);
+		}
+	}
+	return opponentThreats;
 }
 
 void Piece::addThreat(shared_ptr<Piece> threat){
@@ -99,12 +78,10 @@ bool Piece::operator==(const Piece &other) const{
 }
 
 void Piece::notify(ChessBoard &board){
-	clearThreats();
 	updateLegalMoves(board);
-	cout << "Location Legal Moves Count: " << location.col << "/" << location.row << " "<< legalMoves.size() << endl;
 	//add this pieces legal moves to the board's legal moves
-	vector<shared_ptr<const ChessMove>> boardLegalMoves = board.getLegalMoves(colour);
-	for(move : legalMoves){
+	vector<shared_ptr<const ChessMove>> &boardLegalMoves = board.getLegalMoves(colour);
+	for(auto move : legalMoves){
 		boardLegalMoves.emplace_back(move);
 	}
 
@@ -120,7 +97,7 @@ bool Piece::isBlockingCheck(ChessBoard &board) const{
 	//that is along the line 
 	if(location.isInLine(kingLocation)){
 		//get relative direction 
-		Location lineDirection = kingLocation.getRelativeDirection(location);
+		Location lineDirection = location.getRelativeDirection(kingLocation);
 		
 		//iterate along line to see if theres anypiece between this and the king
 		//if a piece is found between them then this piece can move without worrying about 

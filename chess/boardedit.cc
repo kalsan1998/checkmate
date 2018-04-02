@@ -13,7 +13,7 @@ BoardEdit &BoardEdit::operator=(BoardEdit &&other) noexcept{;
 }
 BoardEdit::BoardEdit(BoardEdit &&other) noexcept: pieceAffected{other.pieceAffected}{}
 bool BoardEdit::operator==(const BoardEdit &edit) const{
-	return (*pieceAffected) == (*edit.pieceAffected);
+	return pieceAffected == edit.pieceAffected;
 }
 
 bool BoardEdit::operator!=(const BoardEdit &edit) const{

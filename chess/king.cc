@@ -31,7 +31,7 @@ void King::checkCastlingMoves(ChessBoard &board){
 				for(int i = 0; i < 2; ++i){
 					newLocation += direction;
 					//if one of the two squares arent safe then caslting is invalid
-					if(!board.isLocationSafe(newLocation, getColour())){
+					if(!board.isLocationSafe(newLocation, getColour()) || !board.getPieceAt(newLocation)->isEmpty()){
 						castlingEnabled = false;
 						break;
 					}

@@ -4,7 +4,6 @@
 #include "location.h"
 #include "piece.h"
 #include "emptypiece.h"
-#include <iostream>
 using namespace std;
 
 ClassicChessBoard::ClassicChessBoard(){
@@ -26,8 +25,6 @@ ClassicChessBoard::ClassicChessBoard(){
 		shared_ptr<Piece> blackPawn = PieceFactory::generatePiece('p');
 		executeEdit(PieceAdd{whitePawn, Location{col, whitePawnRow}});
 		executeEdit(PieceAdd{blackPawn, Location{col, blackPawnRow}});
-		attachObserver(whitePawn);
-		attachObserver(blackPawn);
 		
 		//determine the bigger piece type based on column
 		char type = '-';
@@ -49,10 +46,7 @@ ClassicChessBoard::ClassicChessBoard(){
 		shared_ptr<Piece> blackPiece = PieceFactory::generatePiece(type);
 		executeEdit(PieceAdd{whitePiece, Location{col, whiteBigPieceRow}});
 		executeEdit(PieceAdd{blackPiece, Location{col, blackBigPieceRow}});
-		attachObserver(whitePiece);
-		attachObserver(blackPiece);
 	}
-	cout << "BOARD CREATED" << endl;
 }
 
 

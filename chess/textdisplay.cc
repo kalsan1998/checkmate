@@ -9,7 +9,7 @@ TextDisplay::TextDisplay(ChessBoard &board, ostream &out): BoardDisplay{board}, 
 
 void TextDisplay::displayBoard() const{
 	const vector<vector<string>> internal = getBoardInternal();
-	for(int row = 0; row < height; ++row){
+	for(int row = height - 1; row > -1; --row){
 		out << (row + 1) << " "; //display number on side
 		vector<string> rowVec = internal[row];
 		for(auto symbol : rowVec){

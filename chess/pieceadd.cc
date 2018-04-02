@@ -9,15 +9,16 @@ using namespace std;
 PieceAdd::PieceAdd(shared_ptr<Piece> piece, Location location): BoardEdit{piece}, location{location}{}
 void PieceAdd::execute(ChessBoard &board) const{
 	if(board.isInBounds(location)){
-		//clean up peice in location
+		//clean up old piece
 		shared_ptr<Piece> oldPiece = board.theBoard[location];
-		if(!oldPiece->isEmpty()) PieceRemove{oldPiece}.execute(board);
+		PieceRemove{oldPiece}.execute(board);
 
 		//add new piece
 		board.theBoard[location] = pieceAffected;
 		vector<shared_ptr<Piece>> &piecesVec = board.piecesMap[pieceAffected->getColour()][pieceAffected->getType()];
 		piecesVec.emplace_back(pieceAffected);
 		pieceAffected->setLocation(location);
+		board.attachObserver(pieceAffected);
 	}
 	//do nothing if out of bounds
 }

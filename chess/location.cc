@@ -10,7 +10,7 @@ string InvalidLocation::what() const{
 Location::Location(string loc){
 	try{
 		col = static_cast<int>(loc[0]);
-		row = loc[1];
+		row = loc[1] - '0';
 	}catch(...){
 		throw InvalidLocation{};
 	}
@@ -30,16 +30,23 @@ bool Location::isInLine(const Location &location) const{
 	int rowDiff = row - location.row;
 	
 	//returns true if diagonal, or horizontal, or vertical
-	return (colDiff == 0) || (rowDiff == 0) || (rowDiff == colDiff);
+	return (colDiff == 0) || (rowDiff == 0) || (rowDiff == colDiff) || (-rowDiff == colDiff);
+}
+
+bool Location::isBetween(const Location &a, const Location &b) const{
+	if(a.isInLine(b) && isInLine(b)){
+		return a.getRelativeDirection(*this) == this->getRelativeDirection(b);
+	}
+	return false;
 }
 
 Location Location::getRelativeDirection(const Location &other) const{
 	int vertDir = other.row == row ? 0 : 1;
-	vertDir *= row < other.row  ? -1 : 1;
+	vertDir *= row > other.row  ? -1 : 1;
 	int horzDir = other.col == col ? 0 : 1;
-	horzDir *= col < other.col  ? -1 : 1;
+	horzDir *= col > other.col  ? -1 : 1;
 	
-	return Location{vertDir, horzDir};
+	return Location{horzDir, vertDir};
 }
 
 bool Location::operator<(const Location &other) const{

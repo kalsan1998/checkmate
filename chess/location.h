@@ -17,7 +17,9 @@ struct Location{
 	Location(int col, int row);
 	Location(const Location &other);
 	Location &operator=(const Location &other);
-
+	
+	//returns true if this is between a and b (non inclusive)
+	bool isBetween(const Location &a, const Location &b) const;
 	//returns true if this is directly horizontal/vertical/diagonal to the other location
 	bool isInLine(const Location &location) const;
 	//returns a 'unit location' in the direction from this to other

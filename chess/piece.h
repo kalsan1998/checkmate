@@ -20,20 +20,16 @@ class Piece: public BoardObserver{
 	const int value;
 	Location location{-1,-1};
 
-	int moveCount = 0;
+	int moveCount = 1;
 
 	const bool isDiagonal; //piece can move diagonally unlimited (ie bishop or queen)
 	const bool isStraight; //piece can move straight unlimited (ie rook or queen)
 
-	//std::vector<std::shared_ptr<Piece>> reachablePieces;
 	std::vector<std::shared_ptr<Piece>> threats;
 	
 	//this will update all the legal moves of the piece, it will also update
 	// the list of capturable pieces (and update those pieces' threats field)
 	virtual void updateLegalMoves(ChessBoard &board) = 0;
-
-	//void removeReachablePiece(std::shared_ptr<Piece> rmPiece);
-	//void removeThreat(std::shared_ptr<Piece> threat);
 
 	protected:
 	//const std::vector<std::shared_ptr<Piece>> &getReachablePieces() const;
@@ -56,14 +52,13 @@ class Piece: public BoardObserver{
 	Location getLocation() const;
 	virtual void setLocation(const Location location);
 
-	const std::vector<std::shared_ptr<Piece>> &getThreats() const;
-	const std::vector<std::shared_ptr<const ChessMove>> &getLegalMoves() const;
-	//void addReachablePiece(std::shared_ptr<Piece> square); //means this piece can move to the squares location, also updates squares 'threats' field
+	const std::vector<std::shared_ptr<Piece>> &getThreats() const; //gets all pieces that can reach this location
+	std::vector<std::shared_ptr<Piece>> getOpponentThreats() const; //gets threats from opponents
 	void addThreat(std::shared_ptr<Piece> threat); //means threat can move to this piece's location
-
-	void clearLegalMoves();
 	void clearThreats();
-	//void clearReachablePieces();
+
+	const std::vector<std::shared_ptr<const ChessMove>> &getLegalMoves() const;
+	void clearLegalMoves();
 
 	bool isEmpty() const;
 	bool isDiagonalMover() const;

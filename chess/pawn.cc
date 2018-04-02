@@ -89,11 +89,12 @@ void Pawn::checkEnPassantMoves(ChessBoard &board){
 	for(auto side : sides){
 		if(isMoveOk(board, side + movementDirection)){
 			shared_ptr<Piece> piece = board.getPieceAt(side);
-			if(piece->getType() == PieceType::PAWN){	
+			//check that the piece is an opponent pawn and only moved once
+			if((piece->getColour() != getColour()) && (piece->getType() == PieceType::PAWN) && (piece->getMoveCount() == 2)){	
 				//check if the last move was a pawn double
-				StandardMove reqLastMove{static_pointer_cast<Piece>(piece), side};
+				StandardMove reqLastMove{piece, side};
 				shared_ptr<const ChessMove> lastMove = board.getLastMove();
-				if(lastMove && (*lastMove == reqLastMove)){
+				if(lastMove && (reqLastMove == *lastMove)){
 					piece->addThreat(sharedThis);
 					legalMoves.emplace_back(make_shared<EnPassant>(sharedThis, piece, side + movementDirection)); 
 				}
