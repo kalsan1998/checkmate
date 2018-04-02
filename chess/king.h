@@ -2,6 +2,7 @@
 #define KING_H
 
 #include "piece.h"
+#include <vector>
 
 class King: public Piece{
 	void checkCastlingMoves(ChessBoard &board);	
@@ -9,6 +10,8 @@ class King: public Piece{
 
 	void updateLegalMoves(ChessBoard &board) override;
 
+	std::vector<Location> moveableLocation;
+	
 	public:
 	King(Colour colour);
 	void notify(ChessBoard &board) override;

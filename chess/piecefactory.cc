@@ -8,7 +8,6 @@
 #include "knight.h"
 #include "emptypiece.h"
 #include "colour.h"
-#include <memory>
 using namespace std;
 
 PieceFactory::~PieceFactory(){}
@@ -21,10 +20,10 @@ shared_ptr<Piece> PieceFactory::generatePiece(char c){
 	}
 	if(c == 'P'){
 		if(colour == Colour::BLACK){
-			Location dir{-1, 0};
+			Location dir{0, -1};
 			return make_shared<Pawn>(colour,dir);
 		}
-		Location dir{1,0};
+		Location dir{0,1};
 		return make_shared<Pawn>(colour, dir);
 	}
 	if(c == 'K') return make_shared<King>(colour);

@@ -10,10 +10,10 @@
 using namespace std;
 
 MobilePiece::MobilePiece(PieceType type, Colour colour, int value, bool isDiag, bool isStraight, vector<Location> directions):
-	Piece(type, getColour(), value, isDiag, isStraight), directions{directions}{}
+	Piece(type, colour, value, isDiag, isStraight), directions{directions}{}
 	
-void MobilePiece::checkRegularMoves(ChessBoard &board){
-	shared_ptr<MobilePiece> sharedThis{this};
+void MobilePiece::checkRegularMoves(ChessBoard &board){	
+	shared_ptr<Piece> sharedThis = board.getPieceAt(getLocation());
 	//check all the squares in every direction
 	for(size_t i = 0; i < directions.size(); ++i){
 		Location direction = directions[i];
@@ -21,10 +21,11 @@ void MobilePiece::checkRegularMoves(ChessBoard &board){
 		while(board.isInBounds(newLocation)){
 			//if in bounds, add to moveable squares
 			shared_ptr<Piece> piece = board.getPieceAt(newLocation);
-			addReachablePiece(piece);
+			piece->addThreat(sharedThis);
 			//if the move is legal, etiher add chessmove for capture
 			//or regular move
-			if(isMoveOk(board, getLocation())){
+			
+			if(isMoveOk(board, newLocation)){
 				if(piece->isEmpty()){
 					legalMoves.emplace_back(make_shared<StandardMove>(sharedThis, newLocation));
 				}else{
@@ -41,7 +42,6 @@ void MobilePiece::checkRegularMoves(ChessBoard &board){
 	}
 }
 void MobilePiece::updateLegalMoves(ChessBoard &board){
-	clearReachablePieces();
 	legalMoves.clear();
 	checkRegularMoves(board);
 }

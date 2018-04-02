@@ -1,5 +1,6 @@
 #include "location.h"
 #include <limits.h>
+#include <vector>
 using namespace std;
 
 string InvalidLocation::what() const{
@@ -29,7 +30,7 @@ bool Location::isInLine(const Location &location) const{
 	int rowDiff = row - location.row;
 	
 	//returns true if diagonal, or horizontal, or vertical
-	return (colDiff == 0) || (rowDiff == 0) || (rowDiff == col);
+	return (colDiff == 0) || (rowDiff == 0) || (rowDiff == colDiff);
 }
 
 Location Location::getRelativeDirection(const Location &other) const{
@@ -42,9 +43,9 @@ Location Location::getRelativeDirection(const Location &other) const{
 }
 
 bool Location::operator<(const Location &other) const{
-	if(col < other.col) return true;
-	if(col > other.col) return false;
-	return (row < other.row);
+	vector<int> locVec = {row, col};
+	vector<int> otherLocVec = {other.row, other.col};
+	return locVec < otherLocVec; //use vector operator for simplicity
 }
 
 bool Location::operator==(const Location &other) const{
@@ -55,12 +56,12 @@ bool Location::operator!=(const Location &other) const{
 	return (col != other.col) || (row != other.row);
 }
 
-Location &&Location::operator+(const Location &other) const{
-	return move(Location{col + other.col, row + other.row});
+Location Location::operator+(const Location &other) const{
+	return Location{col + other.col, row + other.row};
 }
 
-Location &&Location::operator-(const Location &other) const{
-	return move(Location{col - other.col, row - other.row});
+Location Location::operator-(const Location &other) const{
+	return Location{col - other.col, row - other.row};
 }
 
 Location &Location::operator+=(const Location &other){

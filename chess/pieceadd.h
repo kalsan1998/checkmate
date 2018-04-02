@@ -10,7 +10,7 @@ class Piece;
 class PieceAdd: public BoardEdit{
 	Location location;
 	public:
-	PieceAdd(std::shared_ptr<Piece> piece, const Location &location);
+	PieceAdd(std::shared_ptr<Piece> piece, Location location);
 	
 	void execute(ChessBoard &board) const override;
 	void executeReverse(ChessBoard &board) const override;

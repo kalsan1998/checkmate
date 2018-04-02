@@ -23,10 +23,10 @@ void HumanPlayer::play(ChessBoard &board) const{
 			board.executeMove(getColour(), startLocation, endLocation);
 			
 			//check if pawn promotion
-			const ChessMove &lastMove = board.getLastMove();
+			const shared_ptr<const ChessMove> lastMovePtr = board.getLastMove();
 			const PawnEnd pawnEnd{board.getPieceAt(startLocation), endLocation};
 			const PawnEndCapture pawnEndCap{board.getPieceAt(startLocation), board.getPieceAt(endLocation)};
-			if((lastMove == pawnEnd) || (lastMove == pawnEndCap)){
+			if((*lastMovePtr == pawnEnd) || (*lastMovePtr == pawnEndCap)){
 				char newPieceChar;
 				if(in >> newPieceChar){
 					shared_ptr<Piece> newPiece = PieceFactory::generatePiece(newPieceChar);

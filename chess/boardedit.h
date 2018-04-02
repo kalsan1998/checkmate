@@ -8,7 +8,7 @@ class Piece;
 
 class BoardEdit: public BoardChange{
 	protected:
-	BoardEdit(std::shared_ptr<Piece> piece);
+	BoardEdit(std::shared_ptr<Piece>  piece);
 	std::shared_ptr<Piece> pieceAffected;
 
 	public:

@@ -12,12 +12,12 @@ using namespace std;
 King::King(Colour colour): Piece{PieceType::KING, colour, INT_MAX, false, false}{}
 
 void King::checkCastlingMoves(ChessBoard &board){
-	shared_ptr<King> sharedThis{this};
+	shared_ptr<Piece> sharedThis = board.getPieceAt(getLocation());
 	//castling is only availbale if king has not moved yet and is not in check
 	if(!(getMoveCount() > 1) && !(board.isCheck(getColour()))){
 		//go over all the rooks
 		const vector<shared_ptr<Piece>> &rooks = board.getPieces(getColour()).find(PieceType::ROOK)->second;
-		for(auto &rook : rooks){
+		for(auto rook : rooks){
 			//check if rook moved first
 			if(!(rook->getMoveCount() > 1)){
 				Location rookLocation = rook->getLocation();
@@ -36,7 +36,7 @@ void King::checkCastlingMoves(ChessBoard &board){
 					}
 				}
 				if(castlingEnabled){
-					legalMoves.emplace_back(make_shared<Castling>(sharedThis, static_pointer_cast<Rook>(rook), newLocation, newLocation - direction));
+					legalMoves.emplace_back(make_shared<Castling>(sharedThis, rook, newLocation, newLocation - direction));
 				}
 			}
 		}
@@ -44,27 +44,31 @@ void King::checkCastlingMoves(ChessBoard &board){
 }
 
 void King::checkStandardMoves(ChessBoard &board){
-	shared_ptr<King> sharedThis{this};
-	const vector<shared_ptr<Piece>> &moveableSqrs = getReachablePieces();
-	for(auto piece : moveableSqrs){
-		//regular move
-		if(piece->isEmpty()){
-			legalMoves.emplace_back(make_shared<StandardMove>(sharedThis, piece->getLocation()));
-		//capture move	
-		}else if(piece->getColour() != getColour()){
-			legalMoves.emplace_back(make_shared<Capture>(sharedThis, piece));
-		}	
+	shared_ptr<Piece> sharedThis = board.getPieceAt(getLocation());
+	for(auto location : moveableLocation){
+		if(board.isLocationSafe(location, getColour())){
+			shared_ptr<Piece> piece = board.getPieceAt(location);
+			//regular move
+			if(piece->isEmpty()){
+				legalMoves.emplace_back(make_shared<StandardMove>(sharedThis, location));
+			//capture move	
+			}else if(piece->getColour() != getColour()){
+				legalMoves.emplace_back(make_shared<Capture>(sharedThis, piece));
+			}
+		}
 	}
 }
 
 void King::notify(ChessBoard &board){
-	clearReachablePieces();
+	shared_ptr<Piece> sharedThis = board.getPieceAt(getLocation());
+	moveableLocation.clear();
 	for(int row = -1; row < 2; ++row){
 		for(int col = -1; col <2; ++col){
 			if((col != 0) || (row != 0)){
 				Location movement = getLocation() + Location{row, col};
 				if(board.isInBounds(movement)){
-					addReachablePiece(board.getPieceAt(movement));
+					board.getPieceAt(movement)->addThreat(sharedThis);
+					moveableLocation.emplace_back(movement);
 				}
 			}
 		}

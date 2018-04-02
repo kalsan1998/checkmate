@@ -2,8 +2,8 @@
 #define PIECE_REMOVE_H
 
 #include "boardedit.h"
-#include "location.h"
 #include <memory>
+#include "location.h"
 
 class Piece;
 

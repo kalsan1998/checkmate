@@ -1,6 +1,7 @@
 #include "gamecontroller.h"
 #include "classicchessboard.h"
 #include "piecefactory.h"
+#include "piece.h"
 #include "location.h"
 #include "pieceadd.h"
 #include "pieceremove.h"
@@ -47,9 +48,10 @@ void GameController::setupMode(){
 				string locationStr;
 				//get the piece type and location, then execute
 				if((in >> pieceChar) && (in >> locationStr)){
-					shared_ptr<Piece> piece = make_shared<Piece>(PieceFactory::generatePiece(pieceChar));
+					shared_ptr<Piece> piece = PieceFactory::generatePiece(pieceChar);
 					Location location = Location{locationStr};
 					board->executeEdit(PieceAdd{piece, location});
+					board->attachObserver(piece);
 					board->notifyObservers();
 				}
 			//remove a piece
@@ -60,6 +62,7 @@ void GameController::setupMode(){
 					Location location{locationStr};
 					shared_ptr<Piece> piece = board->getPieceAt(location);
 					board->executeEdit(PieceRemove{piece});
+					board->detachObserver(piece);
 					board->notifyObservers();
 				}
 			}else if(cmd == "="){
@@ -140,7 +143,6 @@ void GameController::init(){
 			playerCount = 2;
 			colours = {Colour::WHITE, Colour::BLACK};
 			board = make_unique<ClassicChessBoard>();
-			
 			/* ---------------------------------------------------------------------------------------
 			ADD DISPLAYS HERE
 			unique_ptr<GraphicDisplay>
@@ -154,7 +156,7 @@ void GameController::init(){
 			// add players until count is met
 			addedPlayers = 0;
 			string player;
-			while((in >> player) && addedPlayers < playerCount){
+			while((in >> player) && (addedPlayers < playerCount)){
 				//check human player
 				if(player == "human"){
 					players.emplace_back(make_unique<HumanPlayer>(colours[addedPlayers], in));

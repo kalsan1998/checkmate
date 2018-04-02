@@ -2,25 +2,43 @@
 #include "boardobserver.h"
 #include "piece.h"
 #include "king.h"
+#include "standardmove.h"
 #include "emptypiece.h"
 #include "location.h"
 #include "boardedit.h"
 #include "chessmove.h"
 #include "invalidmove.h"
+
+#include <iostream>
+
 using namespace std;
 
-ChessBoard::~ChessBoard(){}
-const ChessMove &ChessBoard::getLastMove() const{
-	return *(executedMoves.top());
+ChessBoard::~ChessBoard(){
+	cout << "clearing board" << endl;
+	cout << legalMoves.size() << endl;
+	legalMoves.clear();
+
+	for(auto &pair : theBoard){
+		pair.second->clearThreats();
+		pair.second->clearLegalMoves();
+	}
+}
+const shared_ptr<const ChessMove> ChessBoard::getLastMove() const{
+	if(executedMoves.size() != 0) return executedMoves.top();
+	
+	//return dummy move otherwise
+	shared_ptr<Piece> empty = make_shared<EmptyPiece>();
+	return make_shared<const StandardMove>(empty, empty->getLocation());
 }
 
 void ChessBoard::notifyObservers(){
 	for(auto obs : observers){
 		obs->notify(*this);
 	}
+
 	for(auto &p: piecesMap){
 		//kings need to update their moves last so they can see all the squares in danger
-		getKing(p.first).kingNotify(*this);
+		getKing(p.first)->kingNotify(*this);
 	}
 
 }
@@ -39,19 +57,24 @@ void ChessBoard::detachObserver(shared_ptr<BoardObserver> obs){
 	}
 }
 
+map<Location, shared_ptr<Piece>> &ChessBoard::getBoard(){
+	return theBoard;
+}
+
 const map<PieceType, vector<shared_ptr<Piece>>> &ChessBoard::getPieces(Colour colour){
 	return piecesMap[colour]; 
 }
 
-King &ChessBoard::getKing(Colour colour){
-	return *(static_pointer_cast<King>(((getPieces(colour).find(PieceType::KING))->second).front()));
+shared_ptr<King> ChessBoard::getKing(Colour colour){
+	vector<shared_ptr<Piece>> &pieceVec = piecesMap[colour][PieceType::KING];
+	return static_pointer_cast<King>(pieceVec.front());
 }
 	
-bool ChessBoard::isInBounds(const Location &location) const{
-	return theBoard.count(location) == 1;
+bool ChessBoard::isInBounds(const Location location) const{
+	return theBoard.find(location) != theBoard.end();
 }
 
-shared_ptr<Piece> ChessBoard::getPieceAt(const Location &location) const{
+shared_ptr<Piece> ChessBoard::getPieceAt(const Location location) const{
 	auto it = theBoard.find(location);
 	if(it != theBoard.end()) return it->second;
 	return make_shared<EmptyPiece>();
@@ -66,7 +89,7 @@ void ChessBoard::executeEdit(const BoardEdit &edit){
 }
 
 void ChessBoard::executeMove(Colour colour, const Location start, const Location end){
-	vector<shared_ptr<const ChessMove>> &legals = getLegalMoves(colour);
+	vector<shared_ptr<const ChessMove>> legals = getLegalMoves(colour);
 	for(auto move : legals){
 			if((start == move->getStartLocation()) && (end == move->getEndLocation())){
 				executeChessMove(move);
@@ -75,6 +98,7 @@ void ChessBoard::executeMove(Colour colour, const Location start, const Location
 	}
 	throw InvalidMove{};
 }
+
 
 void ChessBoard::executeChessMove(const shared_ptr<const ChessMove> move){
 	//execute the move, then notify observers, then add this to the stack
@@ -86,7 +110,6 @@ void ChessBoard::executeChessMove(const shared_ptr<const ChessMove> move){
 	//clear all threats of pieces
 	for(auto &pair : theBoard){
 		pair.second->clearThreats();
-		pair.second->clearReachablePieces();
 	}
 	notifyObservers();
 	executedMoves.push(move);
@@ -100,8 +123,8 @@ void ChessBoard::undo(){
 	notifyObservers();
 }
 
-bool ChessBoard::isLocationSafe(const Location &location, Colour colour) const{
-	const vector<shared_ptr<Piece>> &threats = getPieceAt(location)->getThreats();
+bool ChessBoard::isLocationSafe(const Location location, Colour colour) const{
+	const vector<shared_ptr<Piece>> threats = getPieceAt(location)->getThreats();
 	for(auto piece : threats){
 		if(piece->getColour() != colour) return true;
 	}
@@ -109,8 +132,8 @@ bool ChessBoard::isLocationSafe(const Location &location, Colour colour) const{
 }
 
 bool ChessBoard::isCheck(Colour turn){
-	King &king = getKing(turn);
-	return isLocationSafe(king.getLocation(), turn);
+	shared_ptr<King> king = getKing(turn);
+	return isLocationSafe(king->getLocation(), turn);
 }
 
 bool ChessBoard::isStalemate(Colour turn){

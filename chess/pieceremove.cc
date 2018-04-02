@@ -1,5 +1,6 @@
 #include "pieceadd.h"
 #include "pieceremove.h"
+
 #include "chessboard.h"
 #include "piece.h"
 #include "emptypiece.h"
@@ -12,6 +13,8 @@ PieceRemove::PieceRemove(shared_ptr<Piece> piece): BoardEdit{piece}{}
 void PieceRemove::execute(ChessBoard &board) const{
 	board.theBoard[pieceAffected->getLocation()] = make_shared<EmptyPiece>();
 	vector<shared_ptr<Piece>> &pieceVector = board.piecesMap[pieceAffected->getColour()][pieceAffected->getType()];
+	pieceAffected->clearThreats();
+	board.detachObserver(pieceAffected);
 	for(auto it = pieceVector.begin(); it != pieceVector.end(); ++it){
 		//find and remove the piece from the mapping
 		if(*it == pieceAffected){

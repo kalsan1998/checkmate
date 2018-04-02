@@ -13,16 +13,15 @@ Knight::Knight(Colour colour):
 	Piece{PieceType::KNIGHT, colour, 3, false, false}{}
 
 void Knight::checkAllMoves(ChessBoard &board){
-	shared_ptr<Knight> sharedThis{this};
 	Location moves[8] = {{1,2},{2,1},{-1,2},{2,-1},{1,-2},{-2,1},{-1,-2},{-2,-1}};
-	
+	shared_ptr<Piece> sharedThis = board.getPieceAt(getLocation());	
 	//iterate through all 8 moves
 	for(int i = 0; i < 8; ++i){
 		Location newLocation = getLocation() + moves[i];
 		//if the move is in bounds, mark the square as reachable
 		if(board.isInBounds(newLocation)){
 			shared_ptr<Piece> piece = board.getPieceAt(newLocation);
-			addReachablePiece(piece);
+			piece->addThreat(sharedThis);
 			if(isMoveOk(board, newLocation)){
 				//if square is empty, then do standard move
 				if(piece->isEmpty()){
@@ -40,7 +39,6 @@ void Knight::checkAllMoves(ChessBoard &board){
 		
 
 void Knight::updateLegalMoves(ChessBoard &board){
-	clearReachablePieces();
 	legalMoves.clear();
 	checkAllMoves(board);
 }

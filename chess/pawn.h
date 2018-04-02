@@ -3,7 +3,6 @@
 
 #include "piece.h"
 #include "location.h"
-#include <memory>
 #include <vector>
 
 class Pawn: public Piece{

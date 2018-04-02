@@ -1,5 +1,10 @@
 #include "classicchessboard.h"
 #include "piecefactory.h"
+#include "pieceadd.h"
+#include "location.h"
+#include "piece.h"
+#include "emptypiece.h"
+#include <iostream>
 using namespace std;
 
 ClassicChessBoard::ClassicChessBoard(){
@@ -11,16 +16,16 @@ ClassicChessBoard::ClassicChessBoard(){
 	for(char col = 'a'; col <= 'h'; ++col){
 		for(int row = 1; row<= 8; ++row){
 			Location location{col, row};
-			getBoard()[Location] = make_unique<NoPiece>();
+			getBoard()[location] = make_shared<EmptyPiece>();
 		}
 	}
 
-	for(col = 'a'; col <= 'h'; ++col){
+	for(char col = 'a'; col <= 'h'; ++col){
 		//add the Pawns
-		shared_ptr<Pawn> whitePawn = PieceFactory::generatePiece('P');
-		shared_ptr<Pawn> blackPawn = PieceFactory::generatePiece('p');
-		executeEdit(PieceAdd{Location{col, whitePawnRow}, whitePawn);
-		executeEdit(PieceAdd{Location{col, blackPawnRow}, blackPawn);
+		shared_ptr<Piece> whitePawn = PieceFactory::generatePiece('P');
+		shared_ptr<Piece> blackPawn = PieceFactory::generatePiece('p');
+		executeEdit(PieceAdd{whitePawn, Location{col, whitePawnRow}});
+		executeEdit(PieceAdd{blackPawn, Location{col, blackPawnRow}});
 		attachObserver(whitePawn);
 		attachObserver(blackPawn);
 		
@@ -42,12 +47,14 @@ ClassicChessBoard::ClassicChessBoard(){
 		//Add white
 		shared_ptr<Piece> whitePiece = PieceFactory::generatePiece(type - 32);
 		shared_ptr<Piece> blackPiece = PieceFactory::generatePiece(type);
-		executeEdit(PieceAdd{Location{col, whiteBigPieceRow}, whitePiece);
-		executeEdit(PieceAdd{Location{col, blackBigPiecenRow}, blackPiece);
+		executeEdit(PieceAdd{whitePiece, Location{col, whiteBigPieceRow}});
+		executeEdit(PieceAdd{blackPiece, Location{col, blackBigPieceRow}});
 		attachObserver(whitePiece);
 		attachObserver(blackPiece);
 	}
 	//notify all the pieces to get the legal moves
+	cout << "NOTIFYING" << endl;
 	notifyObservers();
+	cout << "BOARD CREATED" << endl;
 }
 

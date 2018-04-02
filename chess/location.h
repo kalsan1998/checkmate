@@ -26,8 +26,8 @@ struct Location{
 	bool operator==(const Location &other) const;
 	bool operator!=(const Location &other) const;
 	bool operator<(const Location &other) const;
-	Location &&operator+(const Location &other) const;
-	Location &&operator-(const Location &other) const;
+	Location operator+(const Location &other) const;
+	Location operator-(const Location &other) const;
 	Location &operator+=(const Location &other);
 	Location &operator-=(const Location &other);
 };

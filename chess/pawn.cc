@@ -26,15 +26,14 @@ Pawn::Pawn(Colour colour, Location direction):
 }
 
 void Pawn::checkStandardMoves(ChessBoard &board){
-	shared_ptr<Pawn> sharedThis{this};
+	shared_ptr<Piece> sharedThis = board.getPieceAt(getLocation());
 	Location oneForward = getLocation() + movementDirection;
 	Location twoForward = oneForward + movementDirection;
-		
+
 	//standard forward move
 	if(isMoveOk(board, oneForward)){
 		if(board.getPieceAt(oneForward)->isEmpty()){
 			legalMoves.emplace_back(make_shared<StandardMove>(sharedThis, oneForward));
-			
 			//double forward for first move
 			if(!(getMoveCount() > 1)){
 				if(board.getPieceAt(twoForward)->isEmpty()){
@@ -50,21 +49,20 @@ void Pawn::checkStandardMoves(ChessBoard &board){
 }
 
 void Pawn::checkCaptureMoves(ChessBoard &board){
-	shared_ptr<Pawn> sharedThis{this};
+	shared_ptr<Piece> sharedThis = board.getPieceAt(getLocation());
 	Location oneForward = getLocation() + movementDirection;
 	Location twoForward = oneForward + movementDirection;
 
 	//the two possible capture locations
 	Location diag1 = oneForward + sideDirection; 
 	Location diag2 = oneForward - sideDirection;
-	Location diags[2] = {diag1, diag2};
+	vector<Location> diags{diag1, diag2};
 	
-	for(int i = 0; i < 2; ++i){
-		Location diag = diags[i];
-		if(board.isInBounds(diag)){	
+	for(auto diag : diags){
+		if(board.isInBounds(diag)){
 			shared_ptr<Piece> piece = board.getPieceAt(diag);
-			addReachablePiece(piece);
-			if(isMoveOk(board, diag)){
+			piece->addThreat(sharedThis);
+			if(isMoveOk(board, diag)){	
 				//piece is capturable
 				if((piece->getColour() != getColour()) && (!piece->isEmpty())){	
 					//capture piece and make it to end
@@ -81,21 +79,21 @@ void Pawn::checkCaptureMoves(ChessBoard &board){
 }
 
 void Pawn::checkEnPassantMoves(ChessBoard &board){
-	shared_ptr<Pawn> sharedThis{this};
+	shared_ptr<Piece> sharedThis = board.getPieceAt(getLocation());
 	Location side1 = getLocation() + sideDirection;
 	Location side2 = getLocation() - sideDirection;
-	Location sides[2] = {side1, side2};
+	vector<Location> sides = {side1, side2};
 
 	// for both directions check if there was a pawn
 	// that skipped a square
-	for(int i = 0; i < 2; ++i){
-		Location side = sides[i];
+	for(auto side : sides){
 		if(isMoveOk(board, side + movementDirection)){
 			shared_ptr<Piece> piece = board.getPieceAt(side);
 			if(piece->getType() == PieceType::PAWN){	
 				//check if the last move was a pawn double
-				StandardMove reqLastMove{static_pointer_cast<Pawn>(piece), side};
-				if(board.getLastMove()== reqLastMove){
+				StandardMove reqLastMove{static_pointer_cast<Piece>(piece), side};
+				shared_ptr<const ChessMove> lastMove = board.getLastMove();
+				if(lastMove && (*lastMove == reqLastMove)){
 					piece->addThreat(sharedThis);
 					legalMoves.emplace_back(make_shared<EnPassant>(sharedThis, piece, side + movementDirection)); 
 				}
@@ -105,7 +103,6 @@ void Pawn::checkEnPassantMoves(ChessBoard &board){
 }
 
 void Pawn::updateLegalMoves(ChessBoard &board){
-	clearReachablePieces();
 	legalMoves.clear();
 	checkStandardMoves(board);
 	checkCaptureMoves(board);

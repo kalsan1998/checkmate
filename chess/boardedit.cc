@@ -3,7 +3,8 @@
 #include <memory>
 using namespace std;
 
-BoardEdit::~BoardEdit() {}
+BoardEdit::~BoardEdit() {
+}
 
 BoardEdit::BoardEdit(shared_ptr<Piece> piece): pieceAffected{piece}{}
 BoardEdit &BoardEdit::operator=(BoardEdit &&other) noexcept{;
