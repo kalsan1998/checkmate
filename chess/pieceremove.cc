@@ -1,6 +1,5 @@
 #include "pieceadd.h"
 #include "pieceremove.h"
-
 #include "chessboard.h"
 #include "piece.h"
 #include "emptypiece.h"

@@ -8,9 +8,6 @@
 #include "boardedit.h"
 #include "chessmove.h"
 #include "invalidmove.h"
-
-#include <iostream>
-
 using namespace std;
 
 ChessBoard::~ChessBoard(){
@@ -44,6 +41,14 @@ void ChessBoard::notifyPieces(){
 		getKing(p.first)->kingNotify(*this);
 	}
 	filterCheckMoves();
+}
+
+vector<Colour> ChessBoard::getColours() const{
+	vector<Colour> colours;
+	for(auto &p : piecesMap){
+		colours.emplace_back(p.first);
+	}
+	return colours;
 }
 
 void ChessBoard::notifyDisplays(){
@@ -157,7 +162,6 @@ void ChessBoard::filterCheckMoves(){
 void ChessBoard::executeMove(Colour colour, const Location &start, const Location &end){
 	vector<shared_ptr<const ChessMove>> &legals = getLegalMoves(colour);
 	for(auto move : legals){
-		cout << "start/end, movestart/moveend: " << start.col << "/" << start.row << " / " << end.col << "/" << end.row << " / " << move->getStartLocation().col << "/"<<move->getStartLocation().row <<" / "<<move->getEndLocation().col<<"/"<<move->getEndLocation().row<<endl; 
 		if((start == move->getStartLocation()) && (end == move->getEndLocation())){
 			executeChessMove(move);
 			return;

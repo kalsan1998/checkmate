@@ -10,8 +10,12 @@
 #include "colour.h"
 #include "player.h"
 #include "humanplayer.h"
-//#include "computerplayer.h"
+#include "leveloneplayer.h"
+#include "leveltwoplayer.h"
+#include "levelthreeplayer.h"
+#include "levelfourplayer.h"
 #include "textdisplay.h"
+#include <sstream>
 using namespace std;
 
 GameController::GameController(istream &in, ostream &out): in{in}, out{out} {}
@@ -209,17 +213,27 @@ void GameController::init(){
 					players.emplace_back(make_unique<HumanPlayer>(colours[addedPlayers], in));
 					++addedPlayers;
 				//check computer player
-				/*}else if((player.len() == 10) && (player.substr(0, 8) == "computer")){
-					string levelStr = player[9];
-					istringstream iss{levelstr};
-					int level;
-					if(iss >> level){
-						players.emplace_back(unique_ptr<Player>{new ComputerPlayer{colours[addedPlayers], board, level}};
+				}else if((player.length() >= 10) && (player.substr(0, 8) == "computer")){
+					char levelStr = player[9];
+					int level = levelStr - '0';
+					if(level > 0){
+						Colour colour = colours[addedPlayers];
+						unique_ptr<Player> newPlayer;
+						if(level == 1){
+							newPlayer = make_unique<LevelOnePlayer>(colour);
+						}else if(level == 2){
+							newPlayer = make_unique<LevelTwoPlayer>(colour);
+						}else if(level == 3){
+							newPlayer = make_unique<LevelThreePlayer>(colour);
+						}else{
+							newPlayer = make_unique<LevelFourPlayer>(colour);
+						}
+						players.emplace_back(move(newPlayer));
 						++addedPlayers;
 					}else{
 						break;
 					}
-				*/}else{
+				}else{
 					//if invalid player input, then user has to type "game..." again
 					out << "Invalid player type" << endl;
 					break;

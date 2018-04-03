@@ -25,12 +25,12 @@ class ChessBoard{
 	std::vector<std::shared_ptr<BoardDisplay>> displays;
 	std::stack<std::shared_ptr<const ChessMove>> executedMoves;
 	std::map<Colour, std::vector<std::shared_ptr<const ChessMove>>> legalMoves;
-	void executeChessMove(const std::shared_ptr<const ChessMove>); // execute move and save to stack
 
 	protected:
 	std::map<Location, std::shared_ptr<Piece>> theBoard;
 
 	public:
+	std::vector<Colour> getColours() const;
 	std::map<Location, std::shared_ptr<Piece>> &getBoard();
 	virtual const std::vector<std::vector<int>> getBounds() const = 0; //returns bounds as {col_min, col_max}}{row_min, row_max}}
 	bool isInBounds(const Location &location) const; //returns true if location is valid on the board
@@ -50,6 +50,7 @@ class ChessBoard{
 	
 	void executeEdit(const BoardEdit &edit); //Executes a add/removal without updating state
 	void executeMove(Colour colour, const Location &start, const Location &end); //Execute a move if valid, else throws
+	void executeChessMove(const std::shared_ptr<const ChessMove>); // execute move and save to stack
 	void undo(); //undoes the last move executed
 
 	bool isLocationSafe(const Location &location, Colour colour) const; //returns true if the location has no opponents threatening it

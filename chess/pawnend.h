@@ -14,10 +14,7 @@ class PawnEnd: public ChessMove{
 	PawnEnd(std::shared_ptr<Piece> pawn, Location end);
 	PawnEnd(PawnEnd &&other) noexcept;
 	PawnEnd &operator=(PawnEnd &&other) noexcept;
-/*TODO
-	void execute(ChessBoard &board) const;
-	void executeReverse(ChessBoard &board) const;
-*/};
+};
 
 
 #endif 
