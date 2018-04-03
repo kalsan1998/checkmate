@@ -24,6 +24,7 @@ class BoardDisplay{
 	std::string getEmptySquareSymbol(Location location) const;
 	
 	public:
+	virtual ~BoardDisplay();
 	BoardDisplay(const ChessBoard &board);
 	void updateDisplay(const ChessBoard &board);
 };

@@ -6,11 +6,12 @@
 #include <stdlib.h>
 using namespace std;
 
-LevelTwoPlayer::LevelTwoPlayer(Colour colour): ComputerPlayer{colour}, levelOne{make_shared<LevelOnePlayer>(colour)}{}
+LevelTwoPlayer::LevelTwoPlayer(Colour colour): ComputerPlayer{colour}, levelOne{make_unique<LevelOnePlayer>(colour)}{}
+LevelTwoPlayer::~LevelTwoPlayer(){}
 
 void LevelTwoPlayer::play(ChessBoard &board) const{
-	shared_ptr<const ChessMove> bestMove = getBestCaptureMove();
-	if(bestMove){
+	shared_ptr<const ChessMove> bestMove = getBestCaptureMove(board);
+	if(bestMove != nullptr){
 		board.executeChessMove(bestMove);
 	}else{
 		levelOne->play(board);

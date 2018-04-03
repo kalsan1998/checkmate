@@ -10,6 +10,7 @@
 using namespace std;
 
 ComputerPlayer::ComputerPlayer(Colour colour): Player{colour}{}
+ComputerPlayer::~ComputerPlayer(){}
 
 const vector<shared_ptr<const ChessMove>> ComputerPlayer::getAllMoves(ChessBoard &board) const{
 	return board.getLegalMoves(getColour());
@@ -49,7 +50,7 @@ shared_ptr<const ChessMove> ComputerPlayer::getBestCaptureMove(ChessBoard &board
 	vector<shared_ptr<const ChessMove>> moves;
 	shared_ptr<const ChessMove> bestMove{nullptr};
 	int maxVal = 1;
-	const vector<shared_ptr<const ChessMove>> &legalMoves = board.getLegalMoves(colour);
+	const vector<shared_ptr<const ChessMove>> &legalMoves = board.getLegalMoves(getColour());
 	//iterate through moves and see which ones end up in a square occupied
 	//by an enemy piece
 	for(auto move : legalMoves){

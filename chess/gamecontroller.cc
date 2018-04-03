@@ -13,7 +13,6 @@
 #include "leveloneplayer.h"
 #include "leveltwoplayer.h"
 #include "levelthreeplayer.h"
-#include "levelfourplayer.h"
 #include "textdisplay.h"
 #include "graphicsdisplay.h"
 #include <sstream>
@@ -235,10 +234,8 @@ void GameController::init(){
 							newPlayer = make_unique<LevelOnePlayer>(colour);
 						}else if(level == 2){
 							newPlayer = make_unique<LevelTwoPlayer>(colour);
-						}else if(level == 3){
-							newPlayer = make_unique<LevelThreePlayer>(colour);
 						}else{
-							newPlayer = make_unique<LevelFourPlayer>(colour);
+							newPlayer = make_unique<LevelThreePlayer>(colour);
 						}
 						players.emplace_back(move(newPlayer));
 						++addedPlayers;

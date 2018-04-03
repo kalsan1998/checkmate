@@ -15,6 +15,7 @@ class ComputerPlayer: public Player{
 	std::shared_ptr<const ChessMove> getBestCaptureMove(ChessBoard &board) const;
 
 	public:
+	virtual ~ComputerPlayer() override;
 	ComputerPlayer(Colour colour);
 };
 

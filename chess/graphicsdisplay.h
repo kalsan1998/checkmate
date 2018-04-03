@@ -2,18 +2,18 @@
 #define GRAPHICS_DISPLAY_H
 
 #include "boarddisplay.h"
-#include <memory>
+#include "window.h"
 
-class Xwindow;
 class ChessBoard;
 
 class GraphicsDisplay: public BoardDisplay{
 	int squareWidth;
 	int squareHeight;
 	void displayBoard() override;
-	std::shared_ptr<Xwindow> window;
+	Xwindow window;
 	
 	public:
+	~GraphicsDisplay();
 	GraphicsDisplay(const ChessBoard &board);
 };
 

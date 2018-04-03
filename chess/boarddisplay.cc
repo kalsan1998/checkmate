@@ -6,6 +6,7 @@
 #include "piece.h"
 using namespace std;
 
+BoardDisplay::~BoardDisplay(){}
 BoardDisplay::BoardDisplay(const ChessBoard &board){
 	const vector<vector<int>> bounds = board.getBounds();
 	colMin = bounds[0][0];
