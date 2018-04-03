@@ -102,20 +102,23 @@ bool Piece::isBlockingCheck(ChessBoard &board) const{
 		//iterate along line to see if theres anypiece between this and the king
 		//if a piece is found between them then this piece can move without worrying about 
 		//opening a check
-		Location currLocation = kingLocation + lineDirection;
+		Location currLocation = kingLocation - lineDirection;
 
-		while(currLocation != location){
-			if(board.getPieceAt(currLocation)->isEmpty()) return false;
-			currLocation += lineDirection;
+		while((currLocation != location) && board.isInBounds(currLocation)){
+			if(!board.getPieceAt(currLocation)->isEmpty()) return false;
+			currLocation -= lineDirection;
 		}
 		//if no piece was found between this and the king, continue along the line until
 		//a piece is found or location is out of bounds
-		currLocation += lineDirection;
+		currLocation -= lineDirection;
 		while(board.isInBounds(currLocation)){
 			shared_ptr<Piece> currPiece = board.getPieceAt(currLocation);
 			//non empty piece found: check if its a piece that can attack the king
-			if(currPiece->isEmpty()){				
-				if(currPiece->isStraightMover()){
+			if(!currPiece->isEmpty()){
+				if(currPiece->getColour() == colour) return false;
+				if(currPiece->isStraightMover() && currPiece->isDiagonalMover()){
+					return true; //cant move
+				}else if(currPiece->isStraightMover()){
 					return (lineDirection.col * lineDirection.row) == 0; //not diagonal
 				}else if(currPiece->isDiagonalMover()){
 					return (lineDirection.col * lineDirection.row) != 0; //diagonal
@@ -123,6 +126,7 @@ bool Piece::isBlockingCheck(ChessBoard &board) const{
 					return false;
 				}
 			}
+			currLocation -= lineDirection;
 		}
 	}
 	return false;

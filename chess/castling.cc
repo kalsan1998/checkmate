@@ -9,8 +9,8 @@ using namespace std;
 
 Castling::Castling(shared_ptr<Piece> king, shared_ptr<Piece> rook, Location kingEnd, Location rookEnd): ChessMove{king, kingEnd}, rook{rook}{	
 	vector<unique_ptr<const BoardEdit>> editSequence;
-	editSequence.emplace_back(make_unique<const PieceRemove>(king));
-	editSequence.emplace_back(make_unique<const PieceRemove>(rook));
+	editSequence.emplace_back(make_unique<const PieceRemove>(king, king->getLocation()));
+	editSequence.emplace_back(make_unique<const PieceRemove>(rook, rook->getLocation()));
 	editSequence.emplace_back(make_unique<const PieceAdd>(king, kingEnd)); 
 	editSequence.emplace_back(make_unique<const PieceAdd>(rook, rookEnd));
 

@@ -13,9 +13,9 @@ class Capture: public ChessMove{
 	Capture(std::shared_ptr<Piece> piece, std::shared_ptr<Piece> captured);
 	Capture(Capture &&other) noexcept;
 	Capture &operator=(Capture &&other) noexcept;
-	void execute(ChessBoard &board) const override;
+/*TODO	void execute(ChessBoard &board) const override;
 	void executeReverse(ChessBoard &board) const override;
-};
+*/};
 
 
 #endif 

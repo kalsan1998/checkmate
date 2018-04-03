@@ -1,5 +1,5 @@
 #include "chessboard.h"
-#include "boardobserver.h"
+#include "boarddisplay.h"
 #include "piece.h"
 #include "king.h"
 #include "standardmove.h"
@@ -21,6 +21,7 @@ ChessBoard::~ChessBoard(){
 		pair.second->clearLegalMoves();
 	}
 }
+
 const shared_ptr<const ChessMove> ChessBoard::getLastMove() const{
 	if(executedMoves.size() != 0) return executedMoves.top();
 	
@@ -29,14 +30,14 @@ const shared_ptr<const ChessMove> ChessBoard::getLastMove() const{
 	return make_shared<const StandardMove>(empty, empty->getLocation());
 }
 
-void ChessBoard::notifyObservers(){
+void ChessBoard::notifyPieces(){
 	legalMoves.clear();
 	//clear all threats of pieces
 	for(auto &pair : theBoard){
 		pair.second->clearThreats();
 	}
-	for(auto obs : observers){
-		obs->notify(*this);
+	for(auto &pair : theBoard){
+		pair.second->notify(*this);
 	}
 	for(auto &p: piecesMap){
 		//kings need to update their moves last so they can see all the squares in danger
@@ -45,15 +46,21 @@ void ChessBoard::notifyObservers(){
 	filterCheckMoves();
 }
 
-void ChessBoard::attachObserver(shared_ptr<BoardObserver> obs){
-	observers.emplace_back(obs);
+void ChessBoard::notifyDisplays(){
+	for(auto display : displays){
+		display->notify(*this);
+	}
 }
 
-void ChessBoard::detachObserver(shared_ptr<BoardObserver> obs){
-	//iterate through observers until matching observer is found
-	for(auto it = observers.begin(); it != observers.end(); ++it){
+void ChessBoard::attachDisplay(shared_ptr<BoardDisplay> obs){
+	displays.emplace_back(obs);
+}
+
+void ChessBoard::detachDisplay(shared_ptr<BoardDisplay> obs){
+	//iterate through displays until matching observer is found
+	for(auto it = displays.begin(); it != displays.end(); ++it){
 		if(obs == *it){
-			observers.erase(it);
+			displays.erase(it);
 			break;
 		}
 	}
@@ -69,7 +76,10 @@ const map<PieceType, vector<shared_ptr<Piece>>> &ChessBoard::getPieces(Colour co
 
 shared_ptr<King> ChessBoard::getKing(Colour colour){
 	vector<shared_ptr<Piece>> &pieceVec = piecesMap[colour][PieceType::KING];
-	return static_pointer_cast<King>(pieceVec.front());
+	if(pieceVec.size() > 0){
+		return static_pointer_cast<King>(pieceVec.front());
+	}
+	return make_shared<King>(Colour::NO_COLOUR,"");
 }
 	
 bool ChessBoard::isInBounds(const Location &location) const{
@@ -159,19 +169,20 @@ void ChessBoard::executeMove(Colour colour, const Location &start, const Locatio
 
 
 void ChessBoard::executeChessMove(const shared_ptr<const ChessMove> move){
-	//execute the move, then notify observers, then add this to the stack
+	//execute the move, then notify displays, then add this to the stack
 	move->execute(*this);
 	executedMoves.push(move);
-	notifyObservers();
-
+	notifyPieces();
 }
 
 void ChessBoard::undo(){
-	//execute opposite of last move, then remove from moves stack
-	const shared_ptr<const ChessMove> move = executedMoves.top();
-	move->executeReverse(*this);
-	executedMoves.pop();
-	notifyObservers();
+	if(executedMoves.size() > 0){
+		//execute opposite of last move, then remove from moves stack
+		const shared_ptr<const ChessMove> move = executedMoves.top();
+		move->executeReverse(*this);
+		executedMoves.pop();
+		notifyPieces();
+	}
 }
 
 bool ChessBoard::isLocationSafe(const Location &location, Colour colour) const{

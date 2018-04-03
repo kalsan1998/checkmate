@@ -20,6 +20,7 @@ class GameController{
 	//reset() clears players and sets turn and playerCount to 0
 	void reset();
 	int nextTurn(); //changes turn
+	int prevTurn(); //changes turn
 	void setTurn(Colour colour); //sets turn to colour or does nothing if colour DNE
 	
 	//setupMode() enters setup mode for the board and reads input for commands

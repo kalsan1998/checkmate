@@ -41,12 +41,14 @@ bool Location::isBetween(const Location &a, const Location &b) const{
 }
 
 Location Location::getRelativeDirection(const Location &other) const{
-	int vertDir = other.row == row ? 0 : 1;
-	vertDir *= row > other.row  ? -1 : 1;
-	int horzDir = other.col == col ? 0 : 1;
-	horzDir *= col > other.col  ? -1 : 1;
-	
-	return Location{horzDir, vertDir};
+	if(isInLine(other)){
+		int vertDir = other.row == row ? 0 : 1;
+		vertDir *= row > other.row  ? -1 : 1;
+		int horzDir = other.col == col ? 0 : 1;
+		horzDir *= col > other.col  ? -1 : 1;
+		return Location{horzDir, vertDir};
+	}
+	return Location{0,0};
 }
 
 bool Location::operator<(const Location &other) const{

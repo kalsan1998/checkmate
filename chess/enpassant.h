@@ -14,10 +14,10 @@ class EnPassant: public ChessMove{
 	EnPassant(std::shared_ptr<Piece> pawn1, std::shared_ptr<Piece> pawn2, Location pawn1End);
 	EnPassant(EnPassant &&other) noexcept;
 	EnPassant &operator=(EnPassant &&other) noexcept;
-
+/*TODO
 	void execute(ChessBoard &board) const override;
 	void executeReverse(ChessBoard &board) const override;
-
+*/
 };
 
 

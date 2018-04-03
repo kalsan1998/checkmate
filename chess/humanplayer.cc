@@ -20,21 +20,24 @@ void HumanPlayer::play(ChessBoard &board) const{
 	if((in >> start) && (in >> end)){
 		Location startLocation{start};
 		Location endLocation{end};
-			board.executeMove(getColour(), startLocation, endLocation);
+		shared_ptr<Piece> startPiece = board.getPieceAt(start);
+		shared_ptr<Piece> endPiece = board.getPieceAt(end);
+
+		board.executeMove(getColour(), startLocation, endLocation);
 			
 			//check if pawn promotion
 			const shared_ptr<const ChessMove> lastMovePtr = board.getLastMove();
-			const PawnEnd pawnEnd{board.getPieceAt(startLocation), endLocation};
-			const PawnEndCapture pawnEndCap{board.getPieceAt(startLocation), board.getPieceAt(endLocation)};
+			const PawnEnd pawnEnd{startPiece, endLocation};
+			const PawnEndCapture pawnEndCap{startPiece, endPiece};
 			if((*lastMovePtr == pawnEnd) || (*lastMovePtr == pawnEndCap)){
 				char newPieceChar;
 				if(in >> newPieceChar){
 					shared_ptr<Piece> newPiece = PieceFactory::generatePiece(newPieceChar);
-					if(newPiece->getColour() == getColour()){
+					PieceType type = newPiece->getType();
+					if(!newPiece->isEmpty()&&(newPiece->getColour() == getColour())&&(type != PieceType::KING)&&(type != PieceType::PAWN)){
 						board.executeEdit(PieceAdd{newPiece, endLocation});
-						board.attachObserver(newPiece);
-						board.notifyObservers();
 					}else{
+						board.undo();
 						throw InvalidMove{};
 					}
 				}

@@ -17,27 +17,30 @@ void King::checkCastlingMoves(ChessBoard &board){
 	//castling is only availbale if king has not moved yet and is not in check
 	if(!(getMoveCount() > 1) && !(board.isCheck(getColour()))){
 		//go over all the rooks
-		const vector<shared_ptr<Piece>> &rooks = board.getPieces(getColour()).find(PieceType::ROOK)->second;
-		for(auto rook : rooks){
-			//check if rook moved first
-			if(!(rook->getMoveCount() > 1)){
-				Location rookLocation = rook->getLocation();
-				Location direction = getLocation().getRelativeDirection(rookLocation);
-				
-				//check both squares in direction of rook
-				Location newLocation = getLocation();
-				bool castlingEnabled = true;
-				
-				for(int i = 0; i < 2; ++i){
-					newLocation += direction;
-					//if one of the two squares arent safe then caslting is invalid
-					if(!board.isLocationSafe(newLocation, getColour()) || !board.getPieceAt(newLocation)->isEmpty()){
-						castlingEnabled = false;
-						break;
+		auto it = board.getPieces(getColour()).find(PieceType::ROOK);
+		if(it != board.getPieces(getColour()).end()){
+			const vector<shared_ptr<Piece>> &rooks = it->second;
+			for(auto rook : rooks){
+				//check if rook moved first
+				if(!(rook->getMoveCount() > 1)){
+					Location rookLocation = rook->getLocation();
+					Location direction = getLocation().getRelativeDirection(rookLocation);
+					
+					//check both squares in direction of rook
+					Location newLocation = getLocation();
+					bool castlingEnabled = true;
+					
+					for(int i = 0; i < 2; ++i){
+						newLocation += direction;
+						//if one of the two squares arent safe then caslting is invalid
+						if(!board.isLocationSafe(newLocation, getColour()) || !board.getPieceAt(newLocation)->isEmpty()){
+							castlingEnabled = false;
+							break;
+						}
 					}
-				}
-				if(castlingEnabled){
-					legalMoves.emplace_back(make_shared<Castling>(sharedThis, rook, newLocation, newLocation - direction));
+					if(castlingEnabled){
+						legalMoves.emplace_back(make_shared<Castling>(sharedThis, rook, newLocation, newLocation - direction));
+					}
 				}
 			}
 		}

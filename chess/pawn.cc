@@ -33,16 +33,17 @@ void Pawn::checkStandardMoves(ChessBoard &board){
 	//standard forward move
 	if(isMoveOk(board, oneForward)){
 		if(board.getPieceAt(oneForward)->isEmpty()){
-			legalMoves.emplace_back(make_shared<StandardMove>(sharedThis, oneForward));
+			//pawn reaching end
+			if(!board.isInBounds(twoForward)){
+				legalMoves.emplace_back(make_shared<PawnEnd>(sharedThis, oneForward));
+			}else{
+				legalMoves.emplace_back(make_shared<StandardMove>(sharedThis, oneForward));
+			}
 			//double forward for first move
 			if(!(getMoveCount() > 1)){
 				if(board.getPieceAt(twoForward)->isEmpty()){
 					legalMoves.emplace_back(make_shared<StandardMove>(sharedThis, twoForward));
 				}
-			}
-			//pawn reaching end
-			if(!board.isInBounds(twoForward)){
-				legalMoves.emplace_back(make_shared<PawnEnd>(sharedThis, oneForward));
 			}
 		}
 	}	

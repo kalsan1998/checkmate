@@ -30,6 +30,15 @@ int GameController::nextTurn(){
 	return turn;
 }
 
+int GameController::prevTurn(){
+	if(playerCount != 0){
+		--turn;
+		turn += playerCount; //avoid neg
+		turn = turn%playerCount;
+	}
+	return turn;
+}
+
 void GameController::setTurn(Colour colour){
 	for(int i = 0; i < playerCount; ++i){
 		if(players[i]->getColour() == colour){
@@ -80,7 +89,8 @@ void GameController::setupMode(){
 					if(!piece->isEmpty()){
 						Location location = Location{locationStr};
 						board->executeEdit(PieceAdd{piece, location});
-						board->notifyObservers();
+						board->notifyDisplays();
+						board->notifyPieces();
 					}
 				}
 			//remove a piece
@@ -90,8 +100,9 @@ void GameController::setupMode(){
 				if(in >> locationStr){
 					Location location{locationStr};
 					shared_ptr<Piece> piece = board->getPieceAt(location);
-					board->executeEdit(PieceRemove{piece});
-					board->notifyObservers();
+					board->executeEdit(PieceRemove{piece, location});
+					board->notifyDisplays();
+					board->notifyPieces();
 				}
 			}else if(cmd == "="){
 				string colourStr;
@@ -109,17 +120,23 @@ void GameController::setupMode(){
 void GameController::runGame(){
 	Colour winner = Colour::NO_COLOUR;
 	string cmd = "move";
+	board->notifyPieces();
 	do{
 		unique_ptr<Player> &currentPlayer = players[turn];
 		if(cmd == "move"){
 			try{
 				currentPlayer->play(*board);
+				board->notifyDisplays();
 				nextTurn();
 			}catch(InvalidMove &e){
 				out << e.what() << endl;
 			}catch(InvalidLocation &e){
 				out << e.what() <<endl;
 			}
+		}else if(cmd == "undo"){
+			board->undo();
+			board->notifyDisplays();
+			prevTurn();
 		}else if(cmd == "resign"){
 			//the next player is displayed as the winner
 			winner = players[nextTurn()]->getColour();
@@ -133,23 +150,22 @@ void GameController::runGame(){
 		}else if(board->isStalemate(nextPlayerColour)){
 			out << "Stalemate!" << endl;
 			break;
-		}else if(board->isCheck(nextPlayerColour)){
-			out << "Check!" << endl;
 		}
 	}while(in >> cmd);
 
 	if(winner != Colour::NO_COLOUR){
 		if(winner == Colour::WHITE){
-			out << "Black";
-		}else if(winner == Colour::BLACK){
 			out << "White";
+		}else if(winner == Colour::BLACK){
+			out << "Black";
 		}
 		out << " wins!" << endl;
 	}
 }
 
 void GameController::startGame(){
-	board->notifyObservers();
+	board->notifyPieces();
+	board->notifyDisplays();
 	bool gameRunning = false;
 	string cmd;
 	while(in >> cmd){
@@ -179,7 +195,7 @@ void GameController::init(){
 		
 			//ADD DISPLAYS
 			shared_ptr<TextDisplay> textDisplay = make_shared<TextDisplay>(*board, out);
-			board->attachObserver(textDisplay);
+			board->attachDisplay(textDisplay);
 		}else{
 			readPlayers = false;
 		}
