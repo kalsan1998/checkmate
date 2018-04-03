@@ -7,7 +7,7 @@ using namespace std;
 
 Piece::~Piece(){}
 
-Piece::Piece(PieceType type, Colour colour, string displaySymbol, int value, bool isDiag, bool isStraigt): 
+Piece::Piece(PieceType type, Colour colour, string displaySymbol, int value, bool isDiag, bool isStraight): 
 	type{type}, colour{colour}, displaySymbol{displaySymbol}, value{value}, isDiagonal{isDiag}, isStraight{isStraight} {}
 
 Colour Piece::getColour() const{
@@ -59,7 +59,7 @@ void Piece::addThreat(shared_ptr<Piece> threat){
 	threats.emplace_back(threat);
 }
 
-const vector<shared_ptr<Piece> > &Piece::getThreats() const{
+const vector<shared_ptr<Piece>> &Piece::getThreats() const{
 	return threats;
 }
 
@@ -92,48 +92,46 @@ const vector<shared_ptr<const ChessMove>> &Piece::getLegalMoves() const{
 }
 
 bool Piece::isBlockingCheck(ChessBoard &board) const{
-	Location kingLocation = board.getKing(colour)->getLocation();
-	//if theres no piece between this and its king, check if there is a queen/rook/bishop
-	//that is along the line 
+	shared_ptr<Piece> king = board.getKing(colour);
+	Location kingLocation = king->getLocation();
 	if(location.isInLine(kingLocation)){
-		//get relative direction 
-		Location lineDirection = location.getRelativeDirection(kingLocation);
-		
-		//iterate along line to see if theres anypiece between this and the king
-		//if a piece is found between them then this piece can move without worrying about 
-		//opening a check
-		Location currLocation = kingLocation - lineDirection;
-
-		while((currLocation != location) && board.isInBounds(currLocation)){
-			if(!board.getPieceAt(currLocation)->isEmpty()) return false;
-			currLocation -= lineDirection;
+		//check if theres a piece between this and king
+		Location direction = kingLocation.getRelativeDirection(location);
+		Location currLocation = kingLocation + direction;
+		while(currLocation != location){
+			shared_ptr<Piece> piece = board.getPieceAt(currLocation);
+			if(!piece->isEmpty()) return false;
+			currLocation += direction;
 		}
-		//if no piece was found between this and the king, continue along the line until
-		//a piece is found or location is out of bounds
-		currLocation -= lineDirection;
+		currLocation += direction;
+		//if theres nothing between this and king, see if a piece
+		//is along the line in the other direction
 		while(board.isInBounds(currLocation)){
-			shared_ptr<Piece> currPiece = board.getPieceAt(currLocation);
-			//non empty piece found: check if its a piece that can attack the king
-			if(!currPiece->isEmpty()){
-				if(currPiece->getColour() == colour) return false;
-				if(currPiece->isStraightMover() && currPiece->isDiagonalMover()){
-					return true; //cant move
-				}else if(currPiece->isStraightMover()){
-					return (lineDirection.col * lineDirection.row) == 0; //not diagonal
-				}else if(currPiece->isDiagonalMover()){
-					return (lineDirection.col * lineDirection.row) != 0; //diagonal
+			shared_ptr<Piece> piece = board.getPieceAt(currLocation);
+			if(!piece->isEmpty()){
+				if(piece->getColour() != colour){
+					bool isStraightMove = piece->isStraightMover();
+					bool isDiagMove = piece->isDiagonalMover();
+					if(isStraightMove && isDiagMove) return true;
+					if(isStraightMove){
+						return (direction.col)*(direction.row) == 0; // means movement is straight
+					}else if(isDiagMove){
+						return (direction.col)*(direction.row) != 0;
+					}else{
+						return false;
+					}
 				}else{
 					return false;
 				}
 			}
-			currLocation -= lineDirection;
+			currLocation += direction;
 		}
 	}
 	return false;
 }
 
 bool Piece::isMoveOk(ChessBoard &board, const Location newLocation) const{
-	shared_ptr<King> king = board.getKing(colour);
+	shared_ptr<Piece> king = board.getKing(colour);
 	Location kingLocation = king->getLocation();
 	bool isBlocking = isBlockingCheck(board);
 	bool isInLine = location.getRelativeDirection(kingLocation) == newLocation.getRelativeDirection(kingLocation);

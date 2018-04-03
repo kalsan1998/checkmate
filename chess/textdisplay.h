@@ -8,10 +8,10 @@ class ChessBoard;
 
 class TextDisplay: public BoardDisplay{
 	std::ostream &out;
-	void displayBoard() const override;
+	void displayBoard()  override;
 	
 	public:
-	TextDisplay(ChessBoard &board, std::ostream &out);
+	TextDisplay(const ChessBoard &board, std::ostream &out);
 };
 
 

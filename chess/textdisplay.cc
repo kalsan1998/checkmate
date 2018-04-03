@@ -5,9 +5,9 @@
 #include "chessboard.h"
 using namespace std;
 
-TextDisplay::TextDisplay(ChessBoard &board, ostream &out): BoardDisplay{board}, out{out}{}
+TextDisplay::TextDisplay(const ChessBoard &board, ostream &out): BoardDisplay{board}, out{out}{}
 
-void TextDisplay::displayBoard() const{
+void TextDisplay::displayBoard() {
 	const vector<vector<string>> internal = getBoardInternal();
 	for(int row = height - 1; row > -1; --row){
 		out << (row + 1) << " "; //display number on side

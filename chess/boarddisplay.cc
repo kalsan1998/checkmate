@@ -6,7 +6,7 @@
 #include "piece.h"
 using namespace std;
 
-BoardDisplay::BoardDisplay(ChessBoard &board){
+BoardDisplay::BoardDisplay(const ChessBoard &board){
 	const vector<vector<int>> bounds = board.getBounds();
 	colMin = bounds[0][0];
 	colMax = bounds[0][1];
@@ -28,7 +28,7 @@ const vector<vector<string>> &BoardDisplay::getBoardInternal() const{
 	return boardInternal;
 }
 
-void BoardDisplay::updateBoardInternal(ChessBoard &board){
+void BoardDisplay::updateBoardInternal(const ChessBoard &board){
 	boardInternal.clear();
 	for(int row = rowMin; row <= rowMax; ++row){
 		vector<string> rowVec;
@@ -52,7 +52,7 @@ void BoardDisplay::updateBoardInternal(ChessBoard &board){
 	}
 }
 
-void BoardDisplay::notify(ChessBoard &board){
+void BoardDisplay::updateDisplay(const ChessBoard &board){
 	updateBoardInternal(board);
 	displayBoard();
 }

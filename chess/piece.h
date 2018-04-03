@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <memory>
-#include "boardobserver.h"
 #include "piecetype.h"
 #include "colour.h"
 #include "chessmove.h"
@@ -13,7 +12,7 @@
 
 class ChessBoard;
 
-class Piece: public BoardObserver{
+class Piece{
 	const PieceType type;
 	const Colour colour;
 	const std::string displaySymbol;
@@ -66,7 +65,7 @@ class Piece: public BoardObserver{
 
 	//this will get all the valid moves on the board, then
 	//update the board's legal moves
-	virtual void notify(ChessBoard &board) override;
+	virtual void notify(ChessBoard &board);
 
 	bool operator==(const Piece &other) const;
 };

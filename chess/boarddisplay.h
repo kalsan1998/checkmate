@@ -1,32 +1,31 @@
 #ifndef BOARD_DISPLAY_H
 #define BOARD_DISPLAY_H
 
-#include "boardobserver.h"
 #include <vector>
 #include <string>
 
 class ChessBoard;
 struct Location;
 
-class BoardDisplay: public BoardObserver{
+class BoardDisplay{
 	int rowMin;
 	int rowMax;
 	int colMin;
 	int colMax;
 	std::vector<std::vector<std::string>> boardInternal;
+	void updateBoardInternal(const ChessBoard &board);
 	
-	virtual void displayBoard() const = 0;
-	void updateBoardInternal(ChessBoard &board);
-	std::string getEmptySquareSymbol(Location location) const;
+	virtual void displayBoard() = 0;
 	
 	protected:
 	int height;
 	int width;
 	const std::vector<std::vector<std::string>> &getBoardInternal() const;
+	std::string getEmptySquareSymbol(Location location) const;
 	
 	public:
-	BoardDisplay(ChessBoard &board);
-	void notify(ChessBoard &board) override;
+	BoardDisplay(const ChessBoard &board);
+	void updateDisplay(const ChessBoard &board);
 };
 
 #endif

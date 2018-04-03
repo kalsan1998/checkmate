@@ -10,7 +10,7 @@ PieceAdd::PieceAdd(shared_ptr<Piece> piece, Location location): BoardEdit{piece}
 void PieceAdd::execute(ChessBoard &board) const{
 	if(board.isInBounds(location)){
 		//clean up old piece
-		shared_ptr<Piece> oldPiece = board.theBoard[location];
+		shared_ptr<Piece> oldPiece = board.getPieceAt(location);
 		PieceRemove{oldPiece, location}.execute(board);
 
 		//add new piece

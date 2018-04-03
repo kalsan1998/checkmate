@@ -17,7 +17,7 @@
 using namespace std;
 
 Pawn::Pawn(Colour colour, string displaySymbol, Location direction): 
-	Piece{PieceType::PAWN, colour, displaySymbol, 1, false, false}, movementDirection{direction}{
+	Piece{PieceType::PAWN, colour, displaySymbol, 1, false, true}, movementDirection{direction}{
 	if(movementDirection.isInLine(Location{0,1})){
 		sideDirection = Location{1, 0};
 	}else{

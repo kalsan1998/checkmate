@@ -15,55 +15,49 @@ const vector<shared_ptr<const ChessMove>> ComputerPlayer::getAllMoves(ChessBoard
 	return board.getLegalMoves(getColour());
 }
 
-const vector<shared_ptr<const ChessMove>> ComputerPlayer::getAvoidCaptureMoves(ChessBoard &board) const{
-	vector<shared_ptr<const ChessMove>> moves;
+shared_ptr<const ChessMove> ComputerPlayer::getBestAvoidCaptureMove(ChessBoard &board) const{
+	shared_ptr<const ChessMove> bestSave{nullptr};
+	int saveVal = 1;
+
 	const map<PieceType, vector<shared_ptr<Piece>>> &piecesMap = board.getPieces(getColour());
 	for(auto &p : piecesMap){
 		vector<shared_ptr<Piece>> pieces = p.second;
 		for(auto piece : pieces){
 			//check if in danger
 			if(piece->getOpponentThreats().size() > 0){
-				const vector<shared_ptr<const ChessMove>> &legalMoves = piece->getLegalMoves();
-				//add the moves that bring the piece to safety
-				for(auto move : legalMoves){
-					Location endLocation = move->getEndLocation();
-					if(board.isLocationSafe(endLocation, getColour())){
-						moves.emplace_back(move);
+				int pieceVal = piece->getValue();
+				if(pieceVal > saveVal){
+					const vector<shared_ptr<const ChessMove>> &legalMoves = piece->getLegalMoves();
+					//add the moves that bring the piece to safety
+					for(auto move : legalMoves){
+						Location endLocation = move->getEndLocation();
+						if(board.isLocationSafe(endLocation, getColour())){
+							bestSave = move;
+							saveVal = pieceVal;
+							break;
+						}
 					}
 				}
 			}
 		}
 
 	}
-	return moves;
+	return bestSave;
 }
 
-const vector<shared_ptr<const ChessMove>> ComputerPlayer::getPreferCaptureMoves(ChessBoard &board) const{
+shared_ptr<const ChessMove> ComputerPlayer::getBestCaptureMove(ChessBoard &board) const{
 	vector<shared_ptr<const ChessMove>> moves;
-	Colour colour = getColour();
-	vector<Colour> opponentColours = board.getColours();//for purpose of finding checks
-
+	shared_ptr<const ChessMove> bestMove{nullptr};
+	int maxVal = 1;
 	const vector<shared_ptr<const ChessMove>> &legalMoves = board.getLegalMoves(colour);
 	//iterate through moves and see which ones end up in a square occupied
 	//by an enemy piece
 	for(auto move : legalMoves){
 		Location endLocation = move->getEndLocation();
 		shared_ptr<Piece> pieceAtEnd = board.getPieceAt(endLocation);
-		if(pieceAtEnd->getColour() != colour){
-			moves.emplace_back(move);
-		}else{
-			//check for check
-			board.executeChessMove(move);
-			for(auto oppColour : opponentColours){
-				if(board.isCheck(oppColour)){
-					moves.emplace_back(move);
-					board.undo();
-				}
-			}
-		}
+		if(pieceAtEnd->getValue() > maxVal) bestMove = move;
 	}
-
-	return moves;
+	return bestMove;
 }
 
 

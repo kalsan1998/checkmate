@@ -4,19 +4,25 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+#include <map>
 #include "player.h"
 #include "colour.h"
 #include "chessboard.h"
+#include "boarddisplay.h"
 
 
 class GameController{
 	std::istream &in;
 	std::ostream &out;
 	std::vector<std::unique_ptr<Player>> players;
+	std::vector<std::unique_ptr<BoardDisplay>> displays;
+	std::map<Colour, long> scoreBoard;
 	std::unique_ptr<ChessBoard> board;
 	int turn;
 	int playerCount; //amount of players
 	
+	void updateDisplays() const;
+
 	//reset() clears players and sets turn and playerCount to 0
 	void reset();
 	int nextTurn(); //changes turn

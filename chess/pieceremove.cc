@@ -11,7 +11,9 @@ PieceRemove::PieceRemove(shared_ptr<Piece> piece, Location location): BoardEdit{
 
 void PieceRemove::execute(ChessBoard &board) const{
 	if(!pieceAffected->isEmpty()){
-		board.theBoard[location] = make_shared<EmptyPiece>();
+		shared_ptr<Piece> empty = make_shared<EmptyPiece>();
+		empty->setLocation(location);
+		board.theBoard[location] = empty;
 		vector<shared_ptr<Piece>> &pieceVector = board.piecesMap[pieceAffected->getColour()][pieceAffected->getType()];
 		pieceAffected->clearThreats();
 		pieceAffected->clearLegalMoves();

@@ -1,5 +1,4 @@
 #include "chessboard.h"
-#include "boarddisplay.h"
 #include "piece.h"
 #include "king.h"
 #include "standardmove.h"
@@ -38,7 +37,7 @@ void ChessBoard::notifyPieces(){
 	}
 	for(auto &p: piecesMap){
 		//kings need to update their moves last so they can see all the squares in danger
-		getKing(p.first)->kingNotify(*this);
+		(static_pointer_cast<King>(getKing(p.first)))->kingNotify(*this);
 	}
 	filterCheckMoves();
 }
@@ -51,26 +50,6 @@ vector<Colour> ChessBoard::getColours() const{
 	return colours;
 }
 
-void ChessBoard::notifyDisplays(){
-	for(auto display : displays){
-		display->notify(*this);
-	}
-}
-
-void ChessBoard::attachDisplay(shared_ptr<BoardDisplay> obs){
-	displays.emplace_back(obs);
-}
-
-void ChessBoard::detachDisplay(shared_ptr<BoardDisplay> obs){
-	//iterate through displays until matching observer is found
-	for(auto it = displays.begin(); it != displays.end(); ++it){
-		if(obs == *it){
-			displays.erase(it);
-			break;
-		}
-	}
-}
-
 map<Location, shared_ptr<Piece>> &ChessBoard::getBoard(){
 	return theBoard;
 }
@@ -79,12 +58,12 @@ const map<PieceType, vector<shared_ptr<Piece>>> &ChessBoard::getPieces(Colour co
 	return piecesMap[colour]; 
 }
 
-shared_ptr<King> ChessBoard::getKing(Colour colour){
+shared_ptr<Piece> ChessBoard::getKing(Colour colour){
 	vector<shared_ptr<Piece>> &pieceVec = piecesMap[colour][PieceType::KING];
 	if(pieceVec.size() > 0){
-		return static_pointer_cast<King>(pieceVec.front());
+		return pieceVec.front();
 	}
-	return make_shared<King>(Colour::NO_COLOUR,"");
+	return make_shared<EmptyPiece>();
 }
 	
 bool ChessBoard::isInBounds(const Location &location) const{
@@ -136,8 +115,11 @@ void ChessBoard::filterCheckMoves(){
 			if(threat->isDiagonalMover() || threat->isStraightMover()){
 				auto it = questionMoves.begin();
 				while(it != questionMoves.end()){
+					// if the king is moving then it is ok
+					// if the piece is moving to a location between threat and king then it is ok
+					Location startLoc = (*it)->getStartLocation();
 					Location newLoc = (*it)->getEndLocation();
-					if((!newLoc.isBetween(kingLoc, threatLoc)) && (newLoc != threatLoc)){
+					if((startLoc != kingLoc) && (!newLoc.isBetween(kingLoc, threatLoc)) && (newLoc != threatLoc)){
 						it = questionMoves.erase(it);
 					}else{
 						++it;
@@ -198,7 +180,7 @@ bool ChessBoard::isLocationSafe(const Location &location, Colour colour) const{
 }
 
 bool ChessBoard::isCheck(Colour turn){
-	shared_ptr<King> king = getKing(turn);
+	shared_ptr<Piece> king = getKing(turn);
 	return king->getOpponentThreats().size() > 0;
 }
 

@@ -8,13 +8,11 @@
 #include "colour.h"
 #include "piecetype.h"
 
-class BoardDisplay;
 class BoardEdit;
 class PieceAdd;
 class PieceRemove;
 class ChessMove;
 class Piece;
-class King;
 struct Location;
 
 class ChessBoard{
@@ -22,7 +20,6 @@ class ChessBoard{
 	friend PieceRemove;
 
 	std::map<Colour, std::map<PieceType, std::vector<std::shared_ptr<Piece>>>> piecesMap;
-	std::vector<std::shared_ptr<BoardDisplay>> displays;
 	std::stack<std::shared_ptr<const ChessMove>> executedMoves;
 	std::map<Colour, std::vector<std::shared_ptr<const ChessMove>>> legalMoves;
 
@@ -37,13 +34,9 @@ class ChessBoard{
 
 	std::shared_ptr<Piece> getPieceAt(const Location &location) const; //get the Piece at a location on the board
 	const std::map<PieceType, std::vector<std::shared_ptr<Piece>>> &getPieces(Colour colour); //gets the pieces for a colour
-	std::shared_ptr<King> getKing(Colour colour);
+	std::shared_ptr<Piece> getKing(Colour colour);
 	void notifyPieces();
 
-	void attachDisplay(std::shared_ptr<BoardDisplay> obs);
-	void detachDisplay(std::shared_ptr<BoardDisplay> obs);
-	void notifyDisplays();
-	
 	std::vector<std::shared_ptr<const ChessMove>> &getLegalMoves(Colour colour); //returns all legal moves for a player
 	const std::shared_ptr<const ChessMove> getLastMove() const;
 	void filterCheckMoves(); //filters "legal moves" during check

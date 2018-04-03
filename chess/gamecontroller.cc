@@ -15,6 +15,7 @@
 #include "levelthreeplayer.h"
 #include "levelfourplayer.h"
 #include "textdisplay.h"
+#include "graphicsdisplay.h"
 #include <sstream>
 using namespace std;
 
@@ -24,6 +25,7 @@ void GameController::reset(){
 	turn = 0;
 	playerCount = 0;
 	players.clear();
+	displays.clear();
 }
 
 int GameController::nextTurn(){
@@ -52,11 +54,18 @@ void GameController::setTurn(Colour colour){
 	}
 }
 
+void GameController::updateDisplays() const{
+	for(auto &display : displays){
+		display->updateDisplay(*board);
+	}
+}
+
 void GameController::setupMode(){
 	string cmd;
 	while(in >> cmd){
 		try{
 			if(cmd == "done"){
+				board->notifyPieces();
 				bool validBoardSetup = true;
 				//check king count + check
 				for(auto &player : players){
@@ -93,8 +102,7 @@ void GameController::setupMode(){
 					if(!piece->isEmpty()){
 						Location location = Location{locationStr};
 						board->executeEdit(PieceAdd{piece, location});
-						board->notifyDisplays();
-						board->notifyPieces();
+						updateDisplays();
 					}
 				}
 			//remove a piece
@@ -105,8 +113,7 @@ void GameController::setupMode(){
 					Location location{locationStr};
 					shared_ptr<Piece> piece = board->getPieceAt(location);
 					board->executeEdit(PieceRemove{piece, location});
-					board->notifyDisplays();
-					board->notifyPieces();
+					updateDisplays();
 				}
 			}else if(cmd == "="){
 				string colourStr;
@@ -130,7 +137,7 @@ void GameController::runGame(){
 		if(cmd == "move"){
 			try{
 				currentPlayer->play(*board);
-				board->notifyDisplays();
+				updateDisplays();
 				nextTurn();
 			}catch(InvalidMove &e){
 				out << e.what() << endl;
@@ -139,7 +146,7 @@ void GameController::runGame(){
 			}
 		}else if(cmd == "undo"){
 			board->undo();
-			board->notifyDisplays();
+			updateDisplays();
 			prevTurn();
 		}else if(cmd == "resign"){
 			//the next player is displayed as the winner
@@ -153,6 +160,7 @@ void GameController::runGame(){
 			break;
 		}else if(board->isStalemate(nextPlayerColour)){
 			out << "Stalemate!" << endl;
+			winner = Colour::NO_COLOUR;
 			break;
 		}
 	}while(in >> cmd);
@@ -164,12 +172,16 @@ void GameController::runGame(){
 			out << "Black";
 		}
 		out << " wins!" << endl;
+		scoreBoard[winner] += 1; 
+	}else{
+		for(auto &player : players){
+			scoreBoard[player->getColour()] += 0.5;
+		}
 	}
 }
 
 void GameController::startGame(){
-	board->notifyPieces();
-	board->notifyDisplays();
+	updateDisplays();
 	bool gameRunning = false;
 	string cmd;
 	while(in >> cmd){
@@ -198,8 +210,8 @@ void GameController::init(){
 			board = make_unique<ClassicChessBoard>();
 		
 			//ADD DISPLAYS
-			shared_ptr<TextDisplay> textDisplay = make_shared<TextDisplay>(*board, out);
-			board->attachDisplay(textDisplay);
+			displays.emplace_back(make_unique<TextDisplay>(*board, out));
+			displays.emplace_back(make_unique<GraphicsDisplay>(*board));
 		}else{
 			readPlayers = false;
 		}
@@ -241,8 +253,17 @@ void GameController::init(){
 			}
 		}
 		if(readPlayers && (addedPlayers == playerCount)){
+			for(auto &player : players){
+				scoreBoard[player->getColour()];
+			}
 			startGame();
-			reset();
+		 	displays.clear();
 		}
 	}
+	out << "Final Score:"<< endl;
+	for(auto &pair : scoreBoard){
+		string colour = (pair.first == Colour::BLACK) ? "Black" : "White";
+		out << colour << ": " << pair.second << endl;
+	}
+	reset();
 }

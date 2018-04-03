@@ -15,7 +15,9 @@ ClassicChessBoard::ClassicChessBoard(){
 	for(char col = 'a'; col <= 'h'; ++col){
 		for(int row = 1; row<= 8; ++row){
 			Location location{col, row};
-			getBoard()[location] = make_shared<EmptyPiece>();
+			shared_ptr<Piece> empty = make_shared<EmptyPiece>();
+			empty->setLocation(location);
+			getBoard()[location] = empty;
 		}
 	}
 
