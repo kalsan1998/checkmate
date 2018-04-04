@@ -9,12 +9,12 @@ using namespace std;
 LevelThreePlayer::LevelThreePlayer(Colour colour): ComputerPlayer{colour}, levelTwo{make_unique<LevelTwoPlayer>(colour)}{}
 LevelThreePlayer::~LevelThreePlayer(){}
 
-void LevelThreePlayer::play(ChessBoard &board) const{
+void LevelThreePlayer::doPlay(ChessBoard &board) const{
 	shared_ptr<const ChessMove> bestMove = getBestAvoidCaptureMove(board);
 	if(bestMove != nullptr){
 		board.executeChessMove(bestMove);
 	}else{
-		levelTwo->play(board);
+		levelTwo->doPlay(board);
 	}
 }
 

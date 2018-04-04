@@ -1,17 +1,10 @@
 #include "pawn.h"
-#include "capture.h"
-#include "enpassant.h"
-#include "pawnend.h"
 #include "chessboard.h"
-#include "pawnendcapture.h"
-#include "standardmove.h"
-#include "queen.h"
-#include "rook.h"
-#include "knight.h"
-#include "bishop.h"
-#include "piecetype.h"
 #include "location.h"
-#include "colour.h"
+#include "chessmove.h"
+#include "standardmove.h"
+#include "enpassant.h"
+#include "capture.h"
 #include <memory>
 #include <vector>
 using namespace std;
@@ -34,11 +27,7 @@ void Pawn::checkStandardMoves(ChessBoard &board){
 	if(isMoveOk(board, oneForward)){
 		if(board.getPieceAt(oneForward)->isEmpty()){
 			//pawn reaching end
-			if(!board.isInBounds(twoForward)){
-				legalMoves.emplace_back(make_shared<PawnEnd>(sharedThis, oneForward));
-			}else{
-				legalMoves.emplace_back(make_shared<StandardMove>(sharedThis, oneForward));
-			}
+			legalMoves.emplace_back(make_shared<StandardMove>(sharedThis, oneForward));
 			//double forward for first move
 			if(!(getMoveCount() > 1)){
 				if(board.getPieceAt(twoForward)->isEmpty()){
@@ -52,7 +41,6 @@ void Pawn::checkStandardMoves(ChessBoard &board){
 void Pawn::checkCaptureMoves(ChessBoard &board){
 	shared_ptr<Piece> sharedThis = board.getPieceAt(getLocation());
 	Location oneForward = getLocation() + movementDirection;
-	Location twoForward = oneForward + movementDirection;
 
 	//the two possible capture locations
 	Location diag1 = oneForward + sideDirection; 
@@ -66,13 +54,8 @@ void Pawn::checkCaptureMoves(ChessBoard &board){
 			if(isMoveOk(board, diag)){	
 				//piece is capturable
 				if((piece->getColour() != getColour()) && (!piece->isEmpty())){	
-					//capture piece and make it to end
-					if(!board.isInBounds(twoForward)){	
-						legalMoves.emplace_back(make_shared<PawnEndCapture>(sharedThis, piece));
 					//just capture
-					}else{
-						legalMoves.emplace_back(make_shared<Capture>(sharedThis, piece));
-					}
+					legalMoves.emplace_back(make_shared<Capture>(sharedThis, piece));
 				}
 			}
 		}

@@ -14,7 +14,7 @@ class LevelThreePlayer: public ComputerPlayer{
 	~LevelThreePlayer() override;
 	//prefers avoiding capture
 	LevelThreePlayer(Colour colour);
-	void play(ChessBoard &board) const override;
+	void doPlay(ChessBoard &board) const override;
 };
 
 #endif

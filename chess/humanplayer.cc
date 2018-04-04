@@ -2,10 +2,8 @@
 #include "chessboard.h"
 #include "chessmove.h"
 #include "piece.h"
-#include "pawnend.h"
 #include "pieceadd.h"
 #include "invalidmove.h"
-#include "pawnendcapture.h"
 #include "piecefactory.h"
 #include "colour.h"
 #include <iostream>
@@ -25,11 +23,7 @@ void HumanPlayer::play(ChessBoard &board) const{
 
 		board.executeMove(getColour(), startLocation, endLocation);
 			
-			//check if pawn promotion
-			const shared_ptr<const ChessMove> lastMovePtr = board.getLastMove();
-			const PawnEnd pawnEnd{startPiece, endLocation};
-			const PawnEndCapture pawnEndCap{startPiece, endPiece};
-			if((*lastMovePtr == pawnEnd) || (*lastMovePtr == pawnEndCap)){
+			if(isPawnPromotion(board)){
 				char newPieceChar;
 				if(in >> newPieceChar){
 					shared_ptr<Piece> newPiece = PieceFactory::generatePiece(newPieceChar);

@@ -6,7 +6,10 @@
 #include "chessmove.h"
 #include "chessboard.h"
 #include "piece.h"
+#include "queen.h"
 #include "piecetype.h"
+#include "pieceadd.h"
+#include "piecefactory.h"
 using namespace std;
 
 ComputerPlayer::ComputerPlayer(Colour colour): Player{colour}{}
@@ -61,6 +64,17 @@ shared_ptr<const ChessMove> ComputerPlayer::getBestCaptureMove(ChessBoard &board
 	return bestMove;
 }
 
-
+void ComputerPlayer::play(ChessBoard &board) const{
+	doPlay(board);
+	if(isPawnPromotion(board)){
+		Location end = board.getLastMove()->getEndLocation();
+		Colour colour = getColour();
+		char symbol = 'q';
+		if(colour == Colour::WHITE){
+			symbol = 'Q';
+		}
+		board.executeEdit(PieceAdd{PieceFactory::generatePiece(symbol), end});
+	}
+}
 
 

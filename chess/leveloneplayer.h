@@ -9,7 +9,7 @@ class LevelOnePlayer: public ComputerPlayer{
 	public:
 	//randomly selects moves
 	LevelOnePlayer(Colour colour);
-	void play(ChessBoard &board) const override;
+	void doPlay(ChessBoard &board) const override;
 };
 
 #endif

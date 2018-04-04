@@ -13,7 +13,7 @@ class LevelTwoPlayer: public ComputerPlayer{
 	~LevelTwoPlayer() override;
 	//prefers captures and checks
 	LevelTwoPlayer(Colour colour);
-	void play(ChessBoard &board) const override;
+	void doPlay(ChessBoard &board) const override;
 };
 
 #endif

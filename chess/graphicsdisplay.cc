@@ -24,7 +24,7 @@ void GraphicsDisplay::displayBoard(){
 		vector<string> rowVec = internal[row];
 		for(int col = 0; col < width; ++col){
 			int x = (col+1) *squareWidth;
-			if((row + col)%2 == 0){
+			if((row + col)%2 == 1){
 				window.fillRectangle(x,y,squareWidth,squareHeight,Xwindow::White);
 			}else{
 				window.fillRectangle(x,y,squareWidth,squareHeight,Xwindow::Black);

@@ -8,6 +8,9 @@ class ChessBoard;
 class Player{
 	Colour colour;
 
+	protected:
+	bool isPawnPromotion(ChessBoard &board) const;
+
 	public:
 	virtual ~Player(){}
 	Player(Colour colour);
